@@ -3,6 +3,7 @@ import { Box, Spinner, Center } from '@chakra-ui/react'
 import { Suspense, lazy } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import ScrollToTop from './components/ScrollToTop'
 
 // Lazy load pages for better performance
 const Home = lazy(() => import('./pages/Home'))
@@ -25,6 +26,7 @@ const LoadingSpinner = () => (
 function App() {
   return (
     <Box minH="100vh" display="flex" flexDirection="column">
+      <ScrollToTop />
       <Navbar />
       <Box flex="1">
         <Suspense fallback={<LoadingSpinner />}>

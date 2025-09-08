@@ -16,7 +16,7 @@ const FeatureCard = ({ icon, title, description, colorScheme = 'red' }) => {
     blue: { bg: 'brand.blueLight', icon: 'brand.blue', border: 'brand.blue' },
     brown: { bg: 'brand.brownLight', icon: 'brand.brown', border: 'brand.brown' }
   }
-  
+
   return (
     <MotionBox
       bg="white"
@@ -40,7 +40,7 @@ const FeatureCard = ({ icon, title, description, colorScheme = 'red' }) => {
         bg={colors[colorScheme].bg}
         opacity="0.05"
       />
-      
+
       <Box
         position="absolute"
         top="0"
@@ -49,7 +49,7 @@ const FeatureCard = ({ icon, title, description, colorScheme = 'red' }) => {
         h="4px"
         bg={colors[colorScheme].icon}
       />
-      
+
       <Box
         position="relative"
         zIndex={2}
@@ -69,7 +69,7 @@ const FeatureCard = ({ icon, title, description, colorScheme = 'red' }) => {
           <Icon as={icon} w={10} h={10} color={colors[colorScheme].icon} />
         </Box>
       </Box>
-      
+
       <Box position="relative" zIndex={2}>
         <Heading size="md" mb={3} fontFamily="accent" color="gray.800">{title}</Heading>
         <Text color="gray.600" fontSize="sm" lineHeight="1.6">{description}</Text>
@@ -83,6 +83,16 @@ export default function Home() {
     <Box>
       {/* Hero Section */}
       <HeroSection />
+
+      {/* Featured Work Section */}
+      <FeaturedWork />
+
+
+      {/* Stats Section */}
+      <StatsCounter />
+
+      {/* Testimonials Section */}
+      <Testimonials />
 
       {/* Features Section */}
       <Box py={20} bg="gray.50" position="relative" overflow="hidden">
@@ -109,7 +119,7 @@ export default function Home() {
                 We combine creativity with strategy to deliver designs that drive results.
               </Text>
             </VStack>
-            
+
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
               <FeatureCard
                 icon={FaPalette}
@@ -151,16 +161,6 @@ export default function Home() {
           </VStack>
         </Container>
       </Box>
-
-      {/* Stats Section */}
-      <StatsCounter />
-
-      {/* Testimonials Section */}
-      <Testimonials />
-
-      {/* Featured Work Section */}
-      <FeaturedWork />
-
       {/* CTA Section */}
       <CTASection />
     </Box>
