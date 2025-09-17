@@ -22,7 +22,7 @@ const PackageCard = ({ package: pkg, isPopular, onSelect }) => (
     transition={{ duration: 0.3 }}
   >
     <Box
-      bg="white"
+      bg="rgba(255, 255, 255, 0.1)"
       p={6}
       borderRadius="xl"
       boxShadow="lg"
@@ -51,10 +51,7 @@ const PackageCard = ({ package: pkg, isPopular, onSelect }) => (
           <Heading size="md" fontFamily="accent" textAlign="center">
             {pkg.name}
           </Heading>
-          <Text fontSize="3xl" fontWeight="bold" color="brand.red" textAlign="center">
-            ₹{pkg.price?.toLocaleString('en-IN')}
-          </Text>
-          <Text color="gray.600" fontSize="sm" textAlign="center">
+          <Text color="gray.300" fontSize="sm" textAlign="center">
             Delivery: {pkg.deliveryTime}
           </Text>
         </VStack>
@@ -133,7 +130,7 @@ export default function ServiceDetail() {
   if (!service) {
     return (
       <Box p={20} textAlign="center">
-        <Text fontSize="xl" color="gray.600">Service not found</Text>
+        <Text fontSize="xl" color="gray.300">Service not found</Text>
         <Button as={RouterLink} to="/services" mt={4} colorScheme="red">
           Back to Services
         </Button>
@@ -188,7 +185,7 @@ export default function ServiceDetail() {
                     )}
                   </HStack>
                   
-                  <Heading fontSize="4xl" fontFamily="heading" color="gray.800">
+                  <Heading fontSize="4xl" fontFamily="heading" color="white">
                     {service.name}
                   </Heading>
                   
@@ -197,10 +194,10 @@ export default function ServiceDetail() {
                       <Icon as={FaStar} color="yellow.400" />
                       <Text fontWeight="600">{service.rating}/5</Text>
                     </HStack>
-                    <Text color="gray.600">({service.totalOrders} orders completed)</Text>
+                    <Text color="gray.300">({service.totalOrders} orders completed)</Text>
                   </HStack>
                   
-                  <Text color="gray.600" fontSize="lg" lineHeight="1.8">
+                  <Text color="gray.300" fontSize="lg" lineHeight="1.8">
                     {service.description}
                   </Text>
                 </VStack>
@@ -241,7 +238,7 @@ export default function ServiceDetail() {
                     
                     <TabPanels>
                       <TabPanel px={0}>
-                        <Text color="gray.600" lineHeight="1.8" fontSize="lg">
+                        <Text color="gray.300" lineHeight="1.8" fontSize="lg">
                           {service.detailedDescription}
                         </Text>
                       </TabPanel>
@@ -259,7 +256,7 @@ export default function ServiceDetail() {
                       
                       <TabPanel px={0}>
                         <VStack align="start" spacing={4}>
-                          <Text color="gray.600" lineHeight="1.8">
+                          <Text color="gray.300" lineHeight="1.8">
                             Our streamlined process ensures quality results:
                           </Text>
                           <List spacing={3}>
@@ -296,28 +293,16 @@ export default function ServiceDetail() {
             >
               <VStack spacing={6} align="stretch">
                 {/* Basic Service Info */}
-                <Box bg="gray.50" p={6} borderRadius="xl">
+                <Box bg="rgba(255, 255, 255, 0.1)" p={6} borderRadius="xl">
                   <VStack spacing={4}>
-                    <HStack justify="space-between" w="full">
-                      <Text fontWeight="600">Starting Price:</Text>
-                      <HStack>
-                        {service.originalPrice && (
-                          <Text textDecoration="line-through" color="gray.500">
-                            ₹{service.originalPrice?.toLocaleString('en-IN')}
-                          </Text>
-                        )}
-                        <Text fontSize="2xl" fontWeight="bold" color="brand.red">
-                          ₹{service.price?.toLocaleString('en-IN')}
-                        </Text>
-                      </HStack>
-                    </HStack>
+
                     
                     <HStack justify="space-between" w="full">
                       <HStack>
                         <Icon as={FaClock} color="brand.blue" />
                         <Text fontWeight="600">Delivery:</Text>
                       </HStack>
-                      <Text color="gray.600">{service.deliveryTime}</Text>
+                      <Text color="gray.300">{service.deliveryTime}</Text>
                     </HStack>
                     
                     <HStack justify="space-between" w="full">
@@ -325,7 +310,7 @@ export default function ServiceDetail() {
                         <Icon as={FaRedo} color="brand.brown" />
                         <Text fontWeight="600">Revisions:</Text>
                       </HStack>
-                      <Text color="gray.600">{service.revisions}</Text>
+                      <Text color="gray.300">{service.revisions}</Text>
                     </HStack>
                   </VStack>
                 </Box>
@@ -370,30 +355,7 @@ export default function ServiceDetail() {
             </MotionBox>
           </Grid>
 
-          {/* Service Packages */}
-          {service.packages && service.packages.length > 0 && (
-            <MotionBox
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
-              <VStack spacing={8}>
-                <Heading size="lg" fontFamily="accent" textAlign="center">
-                  Choose Your Package
-                </Heading>
-                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} w="full">
-                  {service.packages.map((pkg, index) => (
-                    <PackageCard
-                      key={index}
-                      package={pkg}
-                      isPopular={index === 1}
-                      onSelect={handlePackageSelect}
-                    />
-                  ))}
-                </SimpleGrid>
-              </VStack>
-            </MotionBox>
-          )}
+
 
           {/* Related Services */}
           {related.length > 0 && (
@@ -416,7 +378,7 @@ export default function ServiceDetail() {
                       transition={{ duration: 0.3 }}
                     >
                       <Box
-                        bg="white"
+                        bg="rgba(255, 255, 255, 0.1)"
                         p={6}
                         borderRadius="xl"
                         boxShadow="lg"
@@ -437,14 +399,12 @@ export default function ServiceDetail() {
                             {item.name}
                           </Heading>
                           
-                          <Text color="gray.600" fontSize="sm" noOfLines={3}>
+                          <Text color="gray.300" fontSize="sm" noOfLines={3}>
                             {item.description}
                           </Text>
                           
                           <HStack justify="space-between" w="full">
-                            <Text fontSize="lg" fontWeight="bold" color="brand.red">
-                              ₹{item.price?.toLocaleString('en-IN')}
-                            </Text>
+
                             <HStack>
                               <Icon as={FaStar} color="yellow.400" size="sm" />
                               <Text fontSize="sm">{item.rating}</Text>

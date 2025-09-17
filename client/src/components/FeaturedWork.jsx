@@ -137,10 +137,10 @@ export default function FeaturedWork() {
       <Container maxW="7xl" position="relative" zIndex={1}>
         <VStack spacing={12}>
           <VStack spacing={4} textAlign="center">
-            <Heading fontSize={{ base: '3xl', md: '4xl' }} fontFamily="heading">
+            <Heading fontSize={{ base: '3xl', md: '4xl' }} fontFamily="heading" color="black">
               FEATURED WORK
             </Heading>
-            <Text fontSize="lg" color="gray.600">
+            <Text fontSize="lg" color="black">
               Explore some of our recent creative projects
             </Text>
           </VStack>
@@ -164,7 +164,7 @@ export default function FeaturedWork() {
               </Button>
             </>
           ) : (
-            <Text color="gray.500" textAlign="center">
+            <Text color="black" textAlign="center">
               No featured work available at the moment.
             </Text>
           )}

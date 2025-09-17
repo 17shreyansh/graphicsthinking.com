@@ -22,11 +22,11 @@ const ContactInfo = ({ icon, title, content, link, colorScheme = 'red' }) => {
       <VStack align="start" spacing={1}>
         <Text fontWeight="600" fontFamily="accent">{title}</Text>
         {link ? (
-          <Link href={link} color="gray.600" _hover={{ color: colors[colorScheme] }}>
+          <Link href={link} color="gray.300" _hover={{ color: colors[colorScheme] }}>
             {content}
           </Link>
         ) : (
-          <Text color="gray.600">{content}</Text>
+          <Text color="gray.300">{content}</Text>
         )}
       </VStack>
     </HStack>
@@ -39,7 +39,8 @@ const SocialLink = ({ icon, href, label }) => (
     isExternal
     p={3}
     borderRadius="full"
-    bg="gray.100"
+    bg="rgba(255, 255, 255, 0.2)"
+    color="white"
     _hover={{ bg: 'brand.red', color: 'white', transform: 'translateY(-2px)' }}
     transition="all 0.3s ease"
   >
@@ -99,7 +100,7 @@ export default function Contact() {
             <Heading fontSize="4xl" fontFamily="heading">
               GET IN TOUCH
             </Heading>
-            <Text fontSize="lg" color="gray.600" maxW="600px">
+            <Text fontSize="lg" color="gray.300" maxW="600px">
               Ready to bring your vision to life? Let's discuss your project and create something amazing together.
             </Text>
           </VStack>
@@ -194,21 +195,21 @@ export default function Contact() {
                   <ContactInfo
                     icon={FaEnvelope}
                     title="Email"
-                    content="hello@graphicsthinking.com"
-                    link="mailto:hello@graphicsthinking.com"
+                    content="devsaxena285@gmail.com"
+                    link="mailto:devsaxena285@gmail.com"
                     colorScheme="red"
                   />
                   <ContactInfo
                     icon={FaPhone}
                     title="Phone"
-                    content="+1 (555) 123-4567"
-                    link="tel:+15551234567"
+                    content="9205900592"
+                    link="tel:+919205900592"
                     colorScheme="blue"
                   />
                   <ContactInfo
                     icon={FaMapMarkerAlt}
                     title="Location"
-                    content="New York, NY, USA"
+                    content="Kaushambi, Ghaziabad, 201010"
                     colorScheme="brown"
                   />
                 </VStack>
@@ -234,14 +235,7 @@ export default function Contact() {
                   </HStack>
                 </Box>
 
-                <Box bg="gray.50" p={6} borderRadius="xl">
-                  <Text fontWeight="600" fontFamily="accent" mb={2}>Business Hours</Text>
-                  <VStack align="start" spacing={1}>
-                    <Text fontSize="sm" color="gray.600">Monday - Friday: 9:00 AM - 6:00 PM</Text>
-                    <Text fontSize="sm" color="gray.600">Saturday: 10:00 AM - 4:00 PM</Text>
-                    <Text fontSize="sm" color="gray.600">Sunday: Closed</Text>
-                  </VStack>
-                </Box>
+
               </VStack>
             </MotionBox>
           </Grid>

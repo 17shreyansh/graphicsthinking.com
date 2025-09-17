@@ -62,16 +62,16 @@ export default function About() {
                 <Heading fontSize="4xl" fontFamily="heading">
                   ABOUT GRAPHICS THINKING
                 </Heading>
-                <Text fontSize="lg" color="gray.600">
-                  We are a creative design studio passionate about transforming ideas into 
-                  visually stunning realities. With over 5 years of experience in the industry, 
-                  we've helped hundreds of businesses establish their visual identity and 
-                  communicate their message effectively.
+                <Text fontSize="lg" color="gray.300">
+                  A passion for transforming ideas into compelling visuals. 
+                  With over 2 years of experience, I specialize in logo design, print design, digital graphics, advertisement design, thumbnail, 
+                  social media post design and web design. My design philosophy is simple, attractive and unique: design should not only 
+                  look good but also drive results.
                 </Text>
-                <Text color="gray.600">
-                  Our approach combines strategic thinking with creative execution, ensuring 
-                  that every design not only looks beautiful but also serves its intended purpose. 
-                  We believe that great design has the power to inspire, influence, and drive results.
+                <Text color="gray.300">
+                  Design isn't just about making things look pretty—it's about creating a visual experience that tells your brand's story. 
+                  I work closely with clients to understand their vision and goals, ensuring that every design is 
+                  not only creative but also strategically effective.
                 </Text>
               </VStack>
             </MotionBox>
@@ -99,7 +99,7 @@ export default function About() {
             >
               <VStack align="start" spacing={6}>
                 <Heading size="xl" fontFamily="heading">OUR EXPERTISE</Heading>
-                <Text color="gray.600">
+                <Text color="gray.300">
                   We specialize in various aspects of graphic design, bringing expertise 
                   and creativity to every project we undertake.
                 </Text>
@@ -126,11 +126,11 @@ export default function About() {
             >
               <VStack align="start" spacing={6}>
                 <Heading size="xl" fontFamily="heading">OUR PHILOSOPHY</Heading>
-                <Text color="gray.600">
+                <Text color="gray.300">
                   "Design is not just what it looks like and feels like. Design is how it works." 
                   - Steve Jobs
                 </Text>
-                <Text color="gray.600">
+                <Text color="gray.300">
                   We believe in the power of thoughtful design. Every project begins with 
                   understanding your goals, your audience, and your message. We then craft 
                   visual solutions that not only capture attention but also drive action.
@@ -147,7 +147,7 @@ export default function About() {
 
           {/* Stats Section */}
           <MotionBox
-            bg="gray.50"
+            bg="rgba(255, 255, 255, 0.1)"
             p={12}
             borderRadius="2xl"
             w="full"
@@ -165,7 +165,7 @@ export default function About() {
                 <Text fontWeight="600" fontFamily="accent">Happy Clients</Text>
               </VStack>
               <VStack>
-                <Heading fontSize="4xl" color="brand.brown" fontFamily="heading">5+</Heading>
+                <Heading fontSize="4xl" color="brand.brown" fontFamily="heading">2+</Heading>
                 <Text fontWeight="600" fontFamily="accent">Years Experience</Text>
               </VStack>
               <VStack>

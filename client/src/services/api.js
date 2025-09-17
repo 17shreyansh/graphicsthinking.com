@@ -45,17 +45,44 @@ export const servicesAPI = {
 }
 
 export const blogAPI = {
-  getAll: () => api.get('/blog'),
+  getAll: (admin = false) => api.get(`/blog${admin ? '?admin=true' : ''}`),
   getById: (id) => api.get(`/blog/${id}`),
-  create: (data) => api.post('/blog', data)
+  create: (data) => api.post('/blog', data),
+  update: (id, data) => api.put(`/blog/${id}`, data),
+  delete: (id) => api.delete(`/blog/${id}`)
 }
 
 export const contactAPI = {
-  send: (data) => api.post('/contact', data)
+  getAll: () => api.get('/contact'),
+  send: (data) => api.post('/contact', data),
+  update: (id, data) => api.put(`/contact/${id}`, data),
+  delete: (id) => api.delete(`/contact/${id}`)
 }
 
 export const testimonialsAPI = {
   getAll: () => api.get('/testimonials')
+}
+
+export const uploadAPI = {
+  uploadImage: (file) => {
+    const formData = new FormData()
+    formData.append('image', file)
+    return api.post('/upload/image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+  uploadImages: (files) => {
+    const formData = new FormData()
+    files.forEach(file => formData.append('images', file))
+    return api.post('/upload/images', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+  deleteImage: (filename) => api.delete(`/upload/image/${filename}`)
 }
 
 export default api

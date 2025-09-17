@@ -1,21 +1,23 @@
 import { useState, useEffect } from 'react'
-import { Layout, Menu, Table, Button, Modal, Form, Input, Select, Upload, message, Tabs, Card } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons'
-import axios from 'axios'
-
-const { Header, Sider, Content } = Layout
-const { TabPane } = Tabs
-const { TextArea } = Input
+import {
+  Box, Container, Heading, Text, VStack, HStack, Button, Table, Thead, Tbody, Tr, Th, Td,
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton,
+  FormControl, FormLabel, Input, Textarea, Select, Switch, useDisclosure, useToast,
+  Tabs, TabList, TabPanels, Tab, TabPanel, Badge, IconButton, Flex, Spacer
+} from '@chakra-ui/react'
+import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa'
+import { portfolioAPI, servicesAPI, blogAPI, contactAPI } from '../services/api'
 
 export default function AdminPanel() {
   const [services, setServices] = useState([])
   const [portfolioItems, setPortfolioItems] = useState([])
   const [blogPosts, setBlogPosts] = useState([])
   const [messages, setMessages] = useState([])
-  const [modalVisible, setModalVisible] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
-  const [activeTab, setActiveTab] = useState('services')
-  const [form] = Form.useForm()
+  const [activeTab, setActiveTab] = useState('portfolio')
+  const [formData, setFormData] = useState({})
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const toast = useToast()
 
   useEffect(() => {
     fetchData()
@@ -23,196 +25,409 @@ export default function AdminPanel() {
 
   const fetchData = async () => {
     try {
-      const [servicesRes, portfolioRes, blogRes] = await Promise.all([
-        axios.get('/api/services'),
-        axios.get('/api/portfolio'),
-        axios.get('/api/blog')
+      const [servicesRes, portfolioRes, blogRes, messagesRes] = await Promise.all([
+        servicesAPI.getAll(),
+        portfolioAPI.getAll(),
+        blogAPI.getAll(),
+        contactAPI.getAll()
       ])
-      setServices(servicesRes.data)
-      setPortfolioItems(portfolioRes.data)
-      setBlogPosts(blogRes.data)
+      setServices(servicesRes.services || servicesRes || [])
+      setPortfolioItems(portfolioRes.items || portfolioRes || [])
+      setBlogPosts(blogRes.posts || blogRes || [])
+      setMessages(messagesRes.messages || messagesRes || [])
     } catch (error) {
-      message.error('Failed to fetch data')
+      toast({ title: 'Error', description: 'Failed to fetch data', status: 'error' })
     }
   }
 
-  const handleSave = async (values) => {
+  const handleSave = async () => {
     try {
-      const endpoint = `/api/${activeTab}`
+      const api = activeTab === 'portfolio' ? portfolioAPI : activeTab === 'services' ? servicesAPI : activeTab === 'blog' ? blogAPI : contactAPI
       if (editingItem) {
-        await axios.put(`${endpoint}/${editingItem._id}`, values)
-        message.success('Updated successfully')
+        await api.update(editingItem._id, formData)
+        toast({ title: 'Success', description: 'Updated successfully', status: 'success' })
       } else {
-        await axios.post(endpoint, values)
-        message.success('Created successfully')
+        await api.create(formData)
+        toast({ title: 'Success', description: 'Created successfully', status: 'success' })
       }
-      setModalVisible(false)
+      onClose()
       setEditingItem(null)
-      form.resetFields()
+      setFormData({})
       fetchData()
     } catch (error) {
-      message.error('Failed to save')
+      toast({ title: 'Error', description: 'Failed to save', status: 'error' })
     }
   }
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/${activeTab}/${id}`)
-      message.success('Deleted successfully')
+      const api = activeTab === 'portfolio' ? portfolioAPI : activeTab === 'services' ? servicesAPI : activeTab === 'blog' ? blogAPI : contactAPI
+      await api.delete(id)
+      toast({ title: 'Success', description: 'Deleted successfully', status: 'success' })
       fetchData()
     } catch (error) {
-      message.error('Failed to delete')
+      toast({ title: 'Error', description: 'Failed to delete', status: 'error' })
     }
   }
 
   const openModal = (item = null) => {
     setEditingItem(item)
-    if (item) {
-      form.setFieldsValue(item)
-    } else {
-      form.resetFields()
-    }
-    setModalVisible(true)
+    setFormData(item || {})
+    onOpen()
   }
 
-  const serviceColumns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Price', dataIndex: 'price', key: 'price', render: (price) => `$${price}` },
-    { title: 'Description', dataIndex: 'description', key: 'description', ellipsis: true },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_, record) => (
-        <>
-          <Button icon={<EditOutlined />} onClick={() => openModal(record)} style={{ marginRight: 8 }} />
-          <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record._id)} />
-        </>
-      )
-    }
-  ]
-
-  const portfolioColumns = [
-    { title: 'Title', dataIndex: 'title', key: 'title' },
-    { title: 'Category', dataIndex: 'category', key: 'category' },
-    { title: 'Description', dataIndex: 'description', key: 'description', ellipsis: true },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_, record) => (
-        <>
-          <Button icon={<EditOutlined />} onClick={() => openModal(record)} style={{ marginRight: 8 }} />
-          <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record._id)} />
-        </>
-      )
-    }
-  ]
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
 
   const renderForm = () => {
-    if (activeTab === 'services') {
+    if (activeTab === 'portfolio') {
       return (
-        <>
-          <Form.Item name="name" label="Service Name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="description" label="Description" rules={[{ required: true }]}>
-            <TextArea rows={4} />
-          </Form.Item>
-          <Form.Item name="price" label="Price" rules={[{ required: true }]}>
-            <Input type="number" />
-          </Form.Item>
-        </>
+        <VStack spacing={4}>
+          <FormControl isRequired>
+            <FormLabel>Title</FormLabel>
+            <Input value={formData.title || ''} onChange={(e) => handleInputChange('title', e.target.value)} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Description</FormLabel>
+            <Textarea value={formData.description || ''} onChange={(e) => handleInputChange('description', e.target.value)} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Detailed Description</FormLabel>
+            <Textarea value={formData.detailedDescription || ''} onChange={(e) => handleInputChange('detailedDescription', e.target.value)} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Category</FormLabel>
+            <Select value={formData.category || ''} onChange={(e) => handleInputChange('category', e.target.value)}>
+              <option value="Logo Design">Logo Design</option>
+              <option value="Social Media">Social Media</option>
+              <option value="Print Design">Print Design</option>
+              <option value="Web Design">Web Design</option>
+              <option value="Branding">Branding</option>
+            </Select>
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Image URL</FormLabel>
+            <Input value={formData.image || ''} onChange={(e) => handleInputChange('image', e.target.value)} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Client</FormLabel>
+            <Input value={formData.client || ''} onChange={(e) => handleInputChange('client', e.target.value)} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Featured</FormLabel>
+            <Switch isChecked={formData.featured || false} onChange={(e) => handleInputChange('featured', e.target.checked)} />
+          </FormControl>
+        </VStack>
       )
     }
     
-    if (activeTab === 'portfolio') {
+    if (activeTab === 'services') {
       return (
-        <>
-          <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="description" label="Description" rules={[{ required: true }]}>
-            <TextArea rows={4} />
-          </Form.Item>
-          <Form.Item name="category" label="Category" rules={[{ required: true }]}>
-            <Select>
-              <Select.Option value="Logos">Logos</Select.Option>
-              <Select.Option value="Posters">Posters</Select.Option>
-              <Select.Option value="Social Media">Social Media</Select.Option>
-              <Select.Option value="Digital Art">Digital Art</Select.Option>
-              <Select.Option value="Branding">Branding</Select.Option>
+        <VStack spacing={4}>
+          <FormControl isRequired>
+            <FormLabel>Service Name</FormLabel>
+            <Input value={formData.name || ''} onChange={(e) => handleInputChange('name', e.target.value)} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Description</FormLabel>
+            <Textarea value={formData.description || ''} onChange={(e) => handleInputChange('description', e.target.value)} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Detailed Description</FormLabel>
+            <Textarea value={formData.detailedDescription || ''} onChange={(e) => handleInputChange('detailedDescription', e.target.value)} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Category</FormLabel>
+            <Select value={formData.category || ''} onChange={(e) => handleInputChange('category', e.target.value)}>
+              <option value="Design Services">Design Services</option>
+              <option value="Branding">Branding</option>
+              <option value="Digital">Digital</option>
             </Select>
-          </Form.Item>
-          <Form.Item name="image" label="Image URL" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-        </>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Image URL</FormLabel>
+            <Input value={formData.image || ''} onChange={(e) => handleInputChange('image', e.target.value)} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Delivery Time</FormLabel>
+            <Input value={formData.deliveryTime || ''} onChange={(e) => handleInputChange('deliveryTime', e.target.value)} />
+          </FormControl>
+        </VStack>
+      )
+    }
+    
+    if (activeTab === 'blog') {
+      return (
+        <VStack spacing={4}>
+          <FormControl isRequired>
+            <FormLabel>Title</FormLabel>
+            <Input value={formData.title || ''} onChange={(e) => handleInputChange('title', e.target.value)} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Excerpt</FormLabel>
+            <Textarea value={formData.excerpt || ''} onChange={(e) => handleInputChange('excerpt', e.target.value)} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Content</FormLabel>
+            <Textarea rows={8} value={formData.content || ''} onChange={(e) => handleInputChange('content', e.target.value)} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Category</FormLabel>
+            <Input value={formData.category || ''} onChange={(e) => handleInputChange('category', e.target.value)} />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Image URL</FormLabel>
+            <Input value={formData.image || ''} onChange={(e) => handleInputChange('image', e.target.value)} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Author</FormLabel>
+            <Input value={formData.author || 'Graphics Thinking'} onChange={(e) => handleInputChange('author', e.target.value)} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Published</FormLabel>
+            <Switch isChecked={formData.published || false} onChange={(e) => handleInputChange('published', e.target.checked)} />
+          </FormControl>
+        </VStack>
+      )
+    }
+    
+    if (activeTab === 'messages') {
+      return (
+        <VStack spacing={4}>
+          <FormControl>
+            <FormLabel>Name</FormLabel>
+            <Input value={formData.name || ''} isReadOnly />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Email</FormLabel>
+            <Input value={formData.email || ''} isReadOnly />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Subject</FormLabel>
+            <Input value={formData.subject || ''} isReadOnly />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Message</FormLabel>
+            <Textarea value={formData.message || ''} isReadOnly rows={4} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Status</FormLabel>
+            <Select value={formData.status || 'new'} onChange={(e) => handleInputChange('status', e.target.value)}>
+              <option value="new">New</option>
+              <option value="read">Read</option>
+              <option value="replied">Replied</option>
+            </Select>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Reply Message</FormLabel>
+            <Textarea value={formData.replyMessage || ''} onChange={(e) => handleInputChange('replyMessage', e.target.value)} rows={4} />
+          </FormControl>
+        </VStack>
       )
     }
   }
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
-      <Header style={{ background: '#E53E3E', padding: '0 24px' }}>
-        <h1 style={{ color: 'white', margin: 0, fontFamily: 'Anton', fontSize: '24px' }}>
-          GRAPHICS THINKING ADMIN
-        </h1>
-      </Header>
+    <Box minH="100vh" bg="#1A365D">
+      <Box bg="brand.red" p={4}>
+        <Container maxW="7xl">
+          <Heading color="white" fontFamily="heading" size="lg">
+            GRAPHICS THINKING ADMIN
+          </Heading>
+        </Container>
+      </Box>
       
-      <Layout>
-        <Content style={{ padding: '24px' }}>
-          <Card>
-            <Tabs activeKey={activeTab} onChange={setActiveTab}>
-              <TabPane tab="Services" key="services">
-                <div style={{ marginBottom: 16 }}>
-                  <Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
-                    Add Service
-                  </Button>
-                </div>
-                <Table columns={serviceColumns} dataSource={services} rowKey="_id" />
-              </TabPane>
-              
-              <TabPane tab="Portfolio" key="portfolio">
-                <div style={{ marginBottom: 16 }}>
-                  <Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
+      <Container maxW="7xl" py={8}>
+        <Tabs index={['portfolio', 'services', 'blog', 'messages'].indexOf(activeTab)} onChange={(index) => setActiveTab(['portfolio', 'services', 'blog', 'messages'][index])}>
+          <TabList>
+            <Tab color="white" _selected={{ color: 'brand.red', borderColor: 'brand.red' }}>Portfolio</Tab>
+            <Tab color="white" _selected={{ color: 'brand.red', borderColor: 'brand.red' }}>Services</Tab>
+            <Tab color="white" _selected={{ color: 'brand.red', borderColor: 'brand.red' }}>Blog</Tab>
+            <Tab color="white" _selected={{ color: 'brand.red', borderColor: 'brand.red' }}>Messages</Tab>
+          </TabList>
+          
+          <TabPanels>
+            <TabPanel>
+              <VStack spacing={6} align="stretch">
+                <Flex>
+                  <Heading size="md" color="white">Portfolio Items</Heading>
+                  <Spacer />
+                  <Button leftIcon={<FaPlus />} colorScheme="red" onClick={() => openModal()}>
                     Add Portfolio Item
                   </Button>
-                </div>
-                <Table columns={portfolioColumns} dataSource={portfolioItems} rowKey="_id" />
-              </TabPane>
-              
-              <TabPane tab="Blog Posts" key="blog">
-                <div style={{ marginBottom: 16 }}>
-                  <Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
+                </Flex>
+                
+                <Box bg="rgba(255,255,255,0.1)" borderRadius="lg" overflow="hidden">
+                  <Table variant="simple">
+                    <Thead>
+                      <Tr>
+                        <Th color="white">Title</Th>
+                        <Th color="white">Category</Th>
+                        <Th color="white">Featured</Th>
+                        <Th color="white">Actions</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {portfolioItems.map((item) => (
+                        <Tr key={item._id}>
+                          <Td color="white">{item.title}</Td>
+                          <Td color="white">{item.category}</Td>
+                          <Td>{item.featured ? <Badge colorScheme="green">Yes</Badge> : <Badge>No</Badge>}</Td>
+                          <Td>
+                            <HStack>
+                              <IconButton icon={<FaEdit />} size="sm" onClick={() => openModal(item)} />
+                              <IconButton icon={<FaTrash />} size="sm" colorScheme="red" onClick={() => handleDelete(item._id)} />
+                            </HStack>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </Box>
+              </VStack>
+            </TabPanel>
+            
+            <TabPanel>
+              <VStack spacing={6} align="stretch">
+                <Flex>
+                  <Heading size="md" color="white">Services</Heading>
+                  <Spacer />
+                  <Button leftIcon={<FaPlus />} colorScheme="red" onClick={() => openModal()}>
+                    Add Service
+                  </Button>
+                </Flex>
+                
+                <Box bg="rgba(255,255,255,0.1)" borderRadius="lg" overflow="hidden">
+                  <Table variant="simple">
+                    <Thead>
+                      <Tr>
+                        <Th color="white">Name</Th>
+                        <Th color="white">Category</Th>
+                        <Th color="white">Actions</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {services.map((service) => (
+                        <Tr key={service._id}>
+                          <Td color="white">{service.name}</Td>
+                          <Td color="white">{service.category}</Td>
+                          <Td>
+                            <HStack>
+                              <IconButton icon={<FaEdit />} size="sm" onClick={() => openModal(service)} />
+                              <IconButton icon={<FaTrash />} size="sm" colorScheme="red" onClick={() => handleDelete(service._id)} />
+                            </HStack>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </Box>
+              </VStack>
+            </TabPanel>
+            
+            <TabPanel>
+              <VStack spacing={6} align="stretch">
+                <Flex>
+                  <Heading size="md" color="white">Blog Posts</Heading>
+                  <Spacer />
+                  <Button leftIcon={<FaPlus />} colorScheme="red" onClick={() => openModal()}>
                     Add Blog Post
                   </Button>
-                </div>
-                <Table dataSource={blogPosts} rowKey="_id" />
-              </TabPane>
-              
-              <TabPane tab="Messages" key="messages">
-                <Table dataSource={messages} rowKey="_id" />
-              </TabPane>
-            </Tabs>
-          </Card>
-        </Content>
-      </Layout>
+                </Flex>
+                
+                <Box bg="rgba(255,255,255,0.1)" borderRadius="lg" overflow="hidden">
+                  <Table variant="simple">
+                    <Thead>
+                      <Tr>
+                        <Th color="white">Title</Th>
+                        <Th color="white">Category</Th>
+                        <Th color="white">Published</Th>
+                        <Th color="white">Actions</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {blogPosts.map((post) => (
+                        <Tr key={post._id}>
+                          <Td color="white">{post.title}</Td>
+                          <Td color="white">{post.category}</Td>
+                          <Td>{post.published ? <Badge colorScheme="green">Yes</Badge> : <Badge>No</Badge>}</Td>
+                          <Td>
+                            <HStack>
+                              <IconButton icon={<FaEdit />} size="sm" onClick={() => openModal(post)} />
+                              <IconButton icon={<FaTrash />} size="sm" colorScheme="red" onClick={() => handleDelete(post._id)} />
+                            </HStack>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </Box>
+              </VStack>
+            </TabPanel>
+            
+            <TabPanel>
+              <VStack spacing={6} align="stretch">
+                <Flex>
+                  <Heading size="md" color="white">Contact Messages</Heading>
+                  <Spacer />
+                </Flex>
+                
+                <Box bg="rgba(255,255,255,0.1)" borderRadius="lg" overflow="hidden">
+                  <Table variant="simple">
+                    <Thead>
+                      <Tr>
+                        <Th color="white">Name</Th>
+                        <Th color="white">Email</Th>
+                        <Th color="white">Subject</Th>
+                        <Th color="white">Status</Th>
+                        <Th color="white">Actions</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {messages.map((message) => (
+                        <Tr key={message._id}>
+                          <Td color="white">{message.name}</Td>
+                          <Td color="white">{message.email}</Td>
+                          <Td color="white">{message.subject}</Td>
+                          <Td>
+                            <Badge colorScheme={message.status === 'new' ? 'red' : message.status === 'read' ? 'yellow' : 'green'}>
+                              {message.status}
+                            </Badge>
+                          </Td>
+                          <Td>
+                            <HStack>
+                              <IconButton icon={<FaEye />} size="sm" onClick={() => openModal(message)} />
+                              <IconButton icon={<FaTrash />} size="sm" colorScheme="red" onClick={() => handleDelete(message._id)} />
+                            </HStack>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </Box>
+              </VStack>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </Container>
 
-      <Modal
-        title={editingItem ? 'Edit Item' : 'Add Item'}
-        open={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        footer={null}
-      >
-        <Form form={form} onFinish={handleSave} layout="vertical">
-          {renderForm()}
-          <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ marginRight: 8 }}>
+      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+        <ModalOverlay />
+        <ModalContent bg="#1A365D" color="white">
+          <ModalHeader>{editingItem ? 'Edit Item' : 'Add Item'}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {renderForm()}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} onClick={handleSave}>
               {editingItem ? 'Update' : 'Create'}
             </Button>
-            <Button onClick={() => setModalVisible(false)}>Cancel</Button>
-          </Form.Item>
-        </Form>
+            <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
       </Modal>
-    </Layout>
+    </Box>
   )
 }

@@ -13,6 +13,7 @@ import {
 import { blogAPI } from '../services/api'
 import { fallbackBlogData } from '../data/fallbackData'
 import Loading from '../components/Loading'
+import EditorJSRenderer from '../components/EditorJSRenderer'
 
 const MotionBox = motion(Box)
 
@@ -231,31 +232,35 @@ export default function BlogDetail() {
               borderRadius="xl"
               boxShadow="lg"
             >
-              <Text
-                fontSize="lg"
-                lineHeight="1.8"
-                color={textColor}
-                whiteSpace="pre-wrap"
-                sx={{
-                  '& p': { mb: 4 },
-                  '& h2': { fontSize: '2xl', fontWeight: 'bold', mb: 4, mt: 8, color: 'gray.800' },
-                  '& h3': { fontSize: 'xl', fontWeight: 'bold', mb: 3, mt: 6, color: 'gray.800' },
-                  '& ul': { pl: 6, mb: 4 },
-                  '& ol': { pl: 6, mb: 4 },
-                  '& li': { mb: 2 },
-                  '& blockquote': { 
-                    borderLeft: '4px solid',
-                    borderColor: 'brand.red',
-                    pl: 4,
-                    py: 2,
-                    fontStyle: 'italic',
-                    bg: 'gray.50',
-                    borderRadius: 'md'
-                  }
-                }}
-              >
-                {post.content}
-              </Text>
+              {typeof post.content === 'object' && post.content.blocks ? (
+                <EditorJSRenderer data={post.content} />
+              ) : (
+                <Text
+                  fontSize="lg"
+                  lineHeight="1.8"
+                  color={textColor}
+                  whiteSpace="pre-wrap"
+                  sx={{
+                    '& p': { mb: 4 },
+                    '& h2': { fontSize: '2xl', fontWeight: 'bold', mb: 4, mt: 8, color: 'gray.800' },
+                    '& h3': { fontSize: 'xl', fontWeight: 'bold', mb: 3, mt: 6, color: 'gray.800' },
+                    '& ul': { pl: 6, mb: 4 },
+                    '& ol': { pl: 6, mb: 4 },
+                    '& li': { mb: 2 },
+                    '& blockquote': { 
+                      borderLeft: '4px solid',
+                      borderColor: 'brand.red',
+                      pl: 4,
+                      py: 2,
+                      fontStyle: 'italic',
+                      bg: 'gray.50',
+                      borderRadius: 'md'
+                    }
+                  }}
+                >
+                  {post.content}
+                </Text>
+              )}
             </Box>
           </MotionBox>
 

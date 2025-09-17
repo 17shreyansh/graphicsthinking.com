@@ -21,7 +21,7 @@ const NavLink = ({ children, to }) => {
       rounded="lg"
       fontFamily="accent"
       fontWeight="600"
-      color={isActive ? 'brand.red' : 'gray.700'}
+      color={isActive ? 'brand.red' : 'white'}
       bg={isActive ? 'brand.redLight' : 'transparent'}
       _hover={{
         textDecoration: 'none',
@@ -41,7 +41,7 @@ export default function Navbar() {
 
   return (
     <MotionBox
-      bg="white"
+      bg="rgba(26, 54, 93, 0.95)"
       px={4}
       boxShadow="lg"
       position="sticky"
@@ -85,7 +85,7 @@ export default function Navbar() {
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Stack as="nav" spacing={4} bg="white" p={4} borderRadius="md" boxShadow="lg" mt={2}>
+          <Stack as="nav" spacing={4} bg="rgba(26, 54, 93, 0.95)" p={4} borderRadius="md" boxShadow="lg" mt={2}>
             <NavLink to="/">Home</NavLink>
             <NavLink to="/about">About</NavLink>
             <NavLink to="/portfolio">Portfolio</NavLink>

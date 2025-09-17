@@ -2,10 +2,11 @@ import { Box, Container, Heading, Text, Grid, VStack, Icon, SimpleGrid } from '@
 import { motion } from 'framer-motion'
 import { FaPalette, FaRocket, FaUsers, FaAward, FaClock, FaHeart } from 'react-icons/fa'
 import HeroSection from '../components/HeroSection'
-import Testimonials from '../components/Testimonials'
+
 import StatsCounter from '../components/StatsCounter'
 import CTASection from '../components/CTASection'
 import FeaturedWork from '../components/FeaturedWork'
+import ServicesSection from '../components/ServicesSection'
 
 const MotionBox = motion(Box)
 const MotionContainer = motion(Container)
@@ -72,7 +73,7 @@ const FeatureCard = ({ icon, title, description, colorScheme = 'red' }) => {
 
       <Box position="relative" zIndex={2}>
         <Heading size="md" mb={3} fontFamily="accent" color="gray.800">{title}</Heading>
-        <Text color="gray.600" fontSize="sm" lineHeight="1.6">{description}</Text>
+        <Text color="gray.800" fontSize="sm" lineHeight="1.6">{description}</Text>
       </Box>
     </MotionBox>
   )
@@ -87,15 +88,17 @@ export default function Home() {
       {/* Featured Work Section */}
       <FeaturedWork />
 
+      {/* Services Section */}
+      <ServicesSection />
+
 
       {/* Stats Section */}
       <StatsCounter />
 
-      {/* Testimonials Section */}
-      <Testimonials />
+
 
       {/* Features Section */}
-      <Box py={20} bg="gray.50" position="relative" overflow="hidden">
+      <Box py={20} bg="rgba(255, 255, 255, 0.05)" position="relative" overflow="hidden">
         {/* Background Pattern */}
         <Box
           position="absolute"
@@ -115,7 +118,7 @@ export default function Home() {
               <Heading fontSize={{ base: '3xl', md: '4xl' }} fontFamily="heading">
                 WHY CHOOSE US
               </Heading>
-              <Text fontSize="lg" color="gray.600" maxW="600px">
+              <Text fontSize="lg" color="gray.300" maxW="600px">
                 We combine creativity with strategy to deliver designs that drive results.
               </Text>
             </VStack>

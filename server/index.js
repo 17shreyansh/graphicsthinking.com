@@ -26,9 +26,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }))
 app.use('/uploads', express.static('uploads'))
 
-// Rate Limiting
-app.use('/api/', generalLimiter)
-app.use('/api/contact', contactLimiter)
+// Rate Limiting (disabled for development)
+// app.use('/api/', generalLimiter)
+// app.use('/api/contact', contactLimiter)
 
 // Routes with Caching
 app.use('/api/portfolio', cacheMiddleware(300), require('./routes/portfolio'))
@@ -36,6 +36,8 @@ app.use('/api/services', cacheMiddleware(600), require('./routes/services'))
 app.use('/api/blog', cacheMiddleware(300), require('./routes/blog'))
 app.use('/api/testimonials', cacheMiddleware(600), require('./routes/testimonials'))
 app.use('/api/contact', require('./routes/contact'))
+app.use('/api/upload', require('./routes/upload'))
+app.use('/api/admin', require('./routes/admin'))
 
 // Health Check
 app.get('/health', (req, res) => {

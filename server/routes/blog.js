@@ -6,8 +6,8 @@ const router = express.Router()
 // Get all blog posts
 router.get('/', async (req, res) => {
   try {
-    const { category, featured, limit = 10, page = 1, search } = req.query
-    const query = { published: true }
+    const { category, featured, limit = 10, page = 1, search, admin } = req.query
+    const query = admin === 'true' ? {} : { published: true }
     
     if (category) {
       query.category = category
@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
       .sort({ featured: -1, publishedAt: -1, createdAt: -1 })
       .limit(parseInt(limit))
       .skip(skip)
-      .select('-content')
+      .select(admin === 'true' ? '' : '-content')
     
     const total = await Blog.countDocuments(query)
     

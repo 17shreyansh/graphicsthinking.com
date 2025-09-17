@@ -16,6 +16,7 @@ const Blog = lazy(() => import('./pages/Blog'))
 const BlogDetail = lazy(() => import('./pages/BlogDetail'))
 const Contact = lazy(() => import('./pages/Contact'))
 const AdminPanel = lazy(() => import('./pages/AdminPanel'))
+const AdminPanelNew = lazy(() => import('./pages/AdminPanelNew'))
 
 const LoadingSpinner = () => (
   <Center h="50vh">
@@ -25,27 +26,35 @@ const LoadingSpinner = () => (
 
 function App() {
   return (
-    <Box minH="100vh" display="flex" flexDirection="column">
-      <ScrollToTop />
-      <Navbar />
-      <Box flex="1">
-        <Suspense fallback={<LoadingSpinner />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/portfolio/:id" element={<PortfolioDetail />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/services/:id" element={<ServiceDetail />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogDetail />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/admin" element={<AdminPanel />} />
-          </Routes>
-        </Suspense>
-      </Box>
-      <Footer />
-    </Box>
+    <Suspense fallback={<LoadingSpinner />}>
+      <Routes>
+        {/* Admin routes without navbar/footer */}
+        <Route path="/admin" element={<AdminPanelNew />} />
+        <Route path="/admin-old" element={<AdminPanel />} />
+        
+        {/* Regular routes with navbar/footer */}
+        <Route path="/*" element={
+          <Box minH="100vh" display="flex" flexDirection="column">
+            <ScrollToTop />
+            <Navbar />
+            <Box flex="1">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/portfolio/:id" element={<PortfolioDetail />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/services/:id" element={<ServiceDetail />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogDetail />} />
+                <Route path="/contact" element={<Contact />} />
+              </Routes>
+            </Box>
+            <Footer />
+          </Box>
+        } />
+      </Routes>
+    </Suspense>
   )
 }
 

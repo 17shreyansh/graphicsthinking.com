@@ -2,9 +2,9 @@ const mongoose = require('mongoose')
 
 const blogSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  slug: { type: String, required: true, unique: true },
+  slug: { type: String, unique: true, sparse: true },
   excerpt: { type: String, required: true },
-  content: { type: String, required: true },
+  content: { type: mongoose.Schema.Types.Mixed, required: true },
   category: { type: String, required: true },
   image: { type: String, required: true },
   images: [String],

@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
-import {
-  Box, Container, Heading, Grid, Text, VStack, Icon, Button, HStack
-} from '@chakra-ui/react'
+import { Box, Container, Heading, Text, Grid, VStack, Icon, Button } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import {
   FaInstagram, FaBullhorn, FaPrint, FaPalette, FaImage, FaGlobe,
@@ -10,7 +8,6 @@ import {
 import { Link as RouterLink } from 'react-router-dom'
 import { servicesAPI } from '../services/api'
 import { fallbackServicesData } from '../data/fallbackData'
-
 
 const MotionBox = motion(Box)
 
@@ -33,9 +30,9 @@ const ServiceCard = ({ service, index }) => {
   const colorScheme = colors[index % 3]
   
   const colorConfig = {
-    red: { icon: 'brand.red', button: 'red' },
-    blue: { icon: 'brand.blue', button: 'blue' },
-    brown: { icon: 'brand.brown', button: 'orange' }
+    red: { icon: 'brand.red' },
+    blue: { icon: 'brand.blue' },
+    brown: { icon: 'brand.brown' }
   }
 
   return (
@@ -63,7 +60,6 @@ const ServiceCard = ({ service, index }) => {
       <Icon as={IconComponent} w={16} h={16} color={colorConfig[colorScheme].icon} mb={6} />
       <Heading size="md" mb={4} fontFamily="accent" color="white">{service.name}</Heading>
       <Text color="gray.300" mb={6} lineHeight="1.6">{service.description}</Text>
-
       <VStack spacing={2}>
         <Button
           as={RouterLink}
@@ -95,7 +91,7 @@ const ServiceCard = ({ service, index }) => {
   )
 }
 
-export default function Services() {
+export default function ServicesSection() {
   const [services, setServices] = useState([])
 
   useEffect(() => {
@@ -105,9 +101,9 @@ export default function Services() {
   const fetchServices = async () => {
     try {
       const response = await servicesAPI.getAll()
-      setServices(response.services || response || [])
+      setServices((response.services || response || []).slice(0, 6))
     } catch (error) {
-      setServices(fallbackServicesData.map(service => ({
+      setServices(fallbackServicesData.slice(0, 6).map(service => ({
         ...service,
         name: service.title
       })))
@@ -116,7 +112,6 @@ export default function Services() {
 
   return (
     <Box py={20} bg="rgba(255, 255, 255, 0.05)" position="relative" overflow="hidden">
-      {/* Background Pattern */}
       <Box
         position="absolute"
         top="0"
@@ -132,12 +127,11 @@ export default function Services() {
       <Container maxW="7xl" position="relative" zIndex={1}>
         <VStack spacing={16}>
           <VStack spacing={4} textAlign="center">
-            <Heading fontSize="4xl" fontFamily="heading">
+            <Heading fontSize="4xl" fontFamily="heading" color="white">
               OUR SERVICES
             </Heading>
             <Text fontSize="lg" color="gray.300" maxW="600px">
-              Professional graphic design services tailored to meet your business needs. 
-              From concept to completion, we deliver exceptional results.
+              Professional graphic design services tailored to meet your business needs.
             </Text>
           </VStack>
 
@@ -154,52 +148,17 @@ export default function Services() {
             ))}
           </Grid>
 
-
-
-          {/* Custom Service CTA */}
-          <MotionBox
-            bg="brand.red"
-            color="white"
-            p={12}
-            borderRadius="2xl"
-            textAlign="center"
-            w="full"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.3 }}
+          <Button
+            as={RouterLink}
+            to="/services"
+            size="lg"
+            variant="outline"
+            borderColor="brand.red"
+            color="brand.red"
+            _hover={{ bg: 'brand.red', color: 'white' }}
           >
-            <VStack spacing={6}>
-              <Heading fontSize="3xl" fontFamily="heading">
-                NEED SOMETHING CUSTOM?
-              </Heading>
-              <Text fontSize="lg" maxW="500px">
-                Don't see what you're looking for? We offer custom design solutions 
-                tailored to your specific requirements.
-              </Text>
-              <HStack spacing={4}>
-                <Button
-                  as={RouterLink}
-                  to="/contact"
-                  bg="white"
-                  color="brand.red"
-                  size="lg"
-                  _hover={{ transform: 'translateY(-2px)' }}
-                >
-                  Discuss Your Project
-                </Button>
-                <Button
-                  as={RouterLink}
-                  to="/portfolio"
-                  variant="outline"
-                  borderColor="white"
-                  color="white"
-                  size="lg"
-                  _hover={{ bg: 'white', color: 'brand.red' }}
-                >
-                  View Our Work
-                </Button>
-              </HStack>
-            </VStack>
-          </MotionBox>
+            View All Services
+          </Button>
         </VStack>
       </Container>
     </Box>

@@ -14,7 +14,7 @@ export default function HeroSection() {
       minH="90vh"
       display="flex"
       alignItems="center"
-      bg="white"
+      bg="transparent"
       position="relative"
       overflow="hidden"
     >
@@ -95,7 +95,7 @@ export default function HeroSection() {
             fontSize={{ base: '4xl', md: '6xl', lg: '7xl' }}
             fontFamily="heading"
             lineHeight="0.9"
-            color="gray.900"
+            color="white"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -113,7 +113,7 @@ export default function HeroSection() {
           
           <MotionText
             fontSize={{ base: 'lg', md: 'xl' }}
-            color="gray.600"
+            color="gray.300"
             maxW="500px"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

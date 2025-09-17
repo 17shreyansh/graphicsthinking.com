@@ -50,8 +50,8 @@ const theme = extendTheme({
   styles: {
     global: {
       body: {
-        bg: '#FFFFFF',
-        color: 'gray.800',
+        bg: '#1A365D',
+        color: 'white',
         lineHeight: '1.6'
       },
       '*': {
