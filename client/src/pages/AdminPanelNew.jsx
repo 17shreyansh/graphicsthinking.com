@@ -4,13 +4,12 @@ import AdminAuth from '../components/AdminAuth'
 import AdminLayout from '../components/admin/AdminLayout'
 import Dashboard from '../components/admin/Dashboard'
 import PortfolioManager from '../components/admin/PortfolioManager'
-import BlogManager from '../components/admin/BlogManager'
-import BlogEditor from '../components/admin/BlogEditor'
+
 import ServicesManager from '../components/admin/ServicesManager'
 import MessagesManager from '../components/admin/MessagesManager'
 import Settings from '../components/admin/Settings'
 
-import { portfolioAPI, servicesAPI, blogAPI, contactAPI } from '../services/api'
+import { portfolioAPI, servicesAPI, contactAPI } from '../services/api'
 
 const { TextArea } = Input
 
@@ -25,12 +24,11 @@ export default function AdminPanelNew() {
   
   const [portfolioItems, setPortfolioItems] = useState([])
   const [services, setServices] = useState([])
-  const [blogPosts, setBlogPosts] = useState([])
+
   const [messages, setMessages] = useState([])
   const [stats, setStats] = useState({})
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  const [showBlogEditor, setShowBlogEditor] = useState(false)
-  const [editingBlog, setEditingBlog] = useState(null)
+
 
   useEffect(() => {
     const authStatus = localStorage.getItem('adminAuth')
@@ -43,22 +41,19 @@ export default function AdminPanelNew() {
   const fetchAllData = async () => {
     setLoading(true)
     try {
-      const [portfolioRes, servicesRes, blogRes, messagesRes] = await Promise.all([
+      const [portfolioRes, servicesRes, messagesRes] = await Promise.all([
         portfolioAPI.getAll(),
         servicesAPI.getAll(),
-        blogAPI.getAll(true),
         contactAPI.getAll()
       ])
       
       setPortfolioItems(portfolioRes.items || portfolioRes || [])
       setServices(servicesRes.services || servicesRes || [])
-      setBlogPosts(blogRes.posts || blogRes || [])
       setMessages(messagesRes.messages || messagesRes || [])
       
       setStats({
         totalPortfolio: (portfolioRes.items || portfolioRes || []).length,
         totalServices: (servicesRes.services || servicesRes || []).length,
-        totalBlogs: (blogRes.posts || blogRes || []).length,
         totalMessages: (messagesRes.messages || messagesRes || []).length,
         newMessages: (messagesRes.messages || messagesRes || []).filter(m => m.status === 'new').length
       })
@@ -79,9 +74,6 @@ export default function AdminPanelNew() {
           break
         case 'services':
           api = servicesAPI
-          break
-        case 'blog':
-          api = blogAPI
           break
         default:
           return
@@ -118,9 +110,6 @@ export default function AdminPanelNew() {
         case 'services':
           api = servicesAPI
           break
-        case 'blog':
-          api = blogAPI
-          break
         case 'messages':
           api = contactAPI
           break
@@ -138,38 +127,16 @@ export default function AdminPanelNew() {
   }
 
   const openModal = (item = null) => {
-    if (selectedMenu === 'blog') {
-      setEditingBlog(item)
-      setShowBlogEditor(true)
+    setEditingItem(item)
+    if (item) {
+      form.setFieldsValue(item)
     } else {
-      setEditingItem(item)
-      if (item) {
-        form.setFieldsValue(item)
-      } else {
-        form.resetFields()
-      }
-      setModalVisible(true)
+      form.resetFields()
     }
+    setModalVisible(true)
   }
 
-  const handleBlogSave = async (data) => {
-    setLoading(true)
-    try {
-      if (editingBlog) {
-        await blogAPI.update(editingBlog._id, data)
-        message.success('Blog updated successfully')
-      } else {
-        await blogAPI.create(data)
-        message.success('Blog created successfully')
-      }
-      setShowBlogEditor(false)
-      setEditingBlog(null)
-      fetchAllData()
-    } catch (error) {
-      message.error('Failed to save blog')
-    }
-    setLoading(false)
-  }
+
 
   const openDrawer = (item) => {
     setEditingItem(item)
@@ -257,34 +224,7 @@ export default function AdminPanelNew() {
           />
         )
 
-      case 'blog':
-        if (showBlogEditor) {
-          return (
-            <BlogEditor
-              blog={editingBlog}
-              onSave={handleBlogSave}
-              onCancel={() => {
-                setShowBlogEditor(false)
-                setEditingBlog(null)
-              }}
-              loading={loading}
-            />
-          )
-        }
-        return (
-          <BlogManager
-            blogPosts={blogPosts}
-            loading={loading}
-            selectedRowKeys={selectedRowKeys}
-            rowSelection={rowSelection}
-            onEdit={openModal}
-            onView={openDrawer}
-            onDelete={handleDelete}
-            onBulkDelete={handleBulkDelete}
-            onExport={handleExport}
-            onAdd={() => openModal()}
-          />
-        )
+
 
       case 'services':
         return (

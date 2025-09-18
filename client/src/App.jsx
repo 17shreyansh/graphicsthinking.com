@@ -12,8 +12,7 @@ const Portfolio = lazy(() => import('./pages/Portfolio'))
 const PortfolioDetail = lazy(() => import('./pages/PortfolioDetail'))
 const Services = lazy(() => import('./pages/Services'))
 const ServiceDetail = lazy(() => import('./pages/ServiceDetail'))
-const Blog = lazy(() => import('./pages/Blog'))
-const BlogDetail = lazy(() => import('./pages/BlogDetail'))
+
 const Contact = lazy(() => import('./pages/Contact'))
 const AdminPanel = lazy(() => import('./pages/AdminPanel'))
 const AdminPanelNew = lazy(() => import('./pages/AdminPanelNew'))
@@ -45,8 +44,7 @@ function App() {
                 <Route path="/portfolio/:id" element={<PortfolioDetail />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/services/:id" element={<ServiceDetail />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogDetail />} />
+
                 <Route path="/contact" element={<Contact />} />
               </Routes>
             </Box>

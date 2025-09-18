@@ -1,17 +1,16 @@
 const express = require('express')
 const Portfolio = require('../models/Portfolio')
 const Service = require('../models/Service')
-const Blog = require('../models/Blog')
+
 const Contact = require('../models/Contact')
 const router = express.Router()
 
 // Get dashboard statistics
 router.get('/stats', async (req, res) => {
   try {
-    const [portfolioCount, servicesCount, blogCount, messagesCount, newMessagesCount] = await Promise.all([
+    const [portfolioCount, servicesCount, messagesCount, newMessagesCount] = await Promise.all([
       Portfolio.countDocuments(),
       Service.countDocuments(),
-      Blog.countDocuments(),
       Contact.countDocuments(),
       Contact.countDocuments({ status: 'new' })
     ])
@@ -19,7 +18,6 @@ router.get('/stats', async (req, res) => {
     res.json({
       totalPortfolio: portfolioCount,
       totalServices: servicesCount,
-      totalBlogs: blogCount,
       totalMessages: messagesCount,
       newMessages: newMessagesCount
     })
@@ -31,16 +29,14 @@ router.get('/stats', async (req, res) => {
 // Get recent activity
 router.get('/recent', async (req, res) => {
   try {
-    const [recentPortfolio, recentMessages, recentBlogs] = await Promise.all([
+    const [recentPortfolio, recentMessages] = await Promise.all([
       Portfolio.find().sort({ createdAt: -1 }).limit(5).select('title category image createdAt'),
-      Contact.find().sort({ createdAt: -1 }).limit(5).select('name subject status createdAt'),
-      Blog.find().sort({ createdAt: -1 }).limit(5).select('title category published createdAt')
+      Contact.find().sort({ createdAt: -1 }).limit(5).select('name subject status createdAt')
     ])
 
     res.json({
       portfolio: recentPortfolio,
-      messages: recentMessages,
-      blogs: recentBlogs
+      messages: recentMessages
     })
   } catch (error) {
     res.status(500).json({ message: error.message })
@@ -59,9 +55,6 @@ router.post('/bulk-delete', async (req, res) => {
         break
       case 'services':
         Model = Service
-        break
-      case 'blog':
-        Model = Blog
         break
       case 'messages':
         Model = Contact
@@ -89,9 +82,6 @@ router.get('/export/:type', async (req, res) => {
         break
       case 'services':
         Model = Service
-        break
-      case 'blog':
-        Model = Blog
         break
       case 'messages':
         Model = Contact

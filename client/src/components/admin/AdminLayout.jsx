@@ -16,7 +16,6 @@ const AdminLayout = ({ children, selectedMenu, onMenuSelect, onLogout }) => {
     { key: 'dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: 'portfolio', icon: <FileImageOutlined />, label: 'Portfolio' },
     { key: 'services', icon: <AppstoreOutlined />, label: 'Services' },
-    { key: 'blog', icon: <EditOutlined />, label: 'Blog Posts' },
     { key: 'messages', icon: <MessageOutlined />, label: 'Messages' },
     { key: 'settings', icon: <SettingOutlined />, label: 'Settings' }
   ]

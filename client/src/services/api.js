@@ -44,13 +44,7 @@ export const servicesAPI = {
   delete: (id) => api.delete(`/services/${id}`)
 }
 
-export const blogAPI = {
-  getAll: (admin = false) => api.get(`/blog${admin ? '?admin=true' : ''}`),
-  getById: (id) => api.get(`/blog/${id}`),
-  create: (data) => api.post('/blog', data),
-  update: (id, data) => api.put(`/blog/${id}`, data),
-  delete: (id) => api.delete(`/blog/${id}`)
-}
+
 
 export const contactAPI = {
   getAll: () => api.get('/contact'),

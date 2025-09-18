@@ -97,7 +97,7 @@ export default function Contact() {
       <Container maxW="7xl">
         <VStack spacing={16}>
           <VStack spacing={4} textAlign="center">
-            <Heading fontSize="4xl" fontFamily="heading">
+            <Heading fontSize="4xl" fontFamily="body" fontWeight="800">
               GET IN TOUCH
             </Heading>
             <Text fontSize="lg" color="gray.300" maxW="600px">

@@ -17,11 +17,16 @@ const SkillBar = ({ skill, percentage, colorScheme = 'red' }) => (
 
 export default function About() {
   const skills = [
-    { skill: 'Logo Design', percentage: 95, colorScheme: 'red' },
-    { skill: 'Brand Identity', percentage: 90, colorScheme: 'blue' },
-    { skill: 'Digital Art', percentage: 88, colorScheme: 'orange' },
-    { skill: 'Print Design', percentage: 92, colorScheme: 'red' },
-    { skill: 'Social Media Design', percentage: 94, colorScheme: 'blue' }
+    { skill: 'Social Media Post Design', percentage: 95, colorScheme: 'red' },
+    { skill: 'Advertisement Design', percentage: 92, colorScheme: 'blue' },
+    { skill: 'Printing Design', percentage: 90, colorScheme: 'orange' },
+    { skill: 'Logo Design', percentage: 94, colorScheme: 'red' },
+    { skill: 'Banner Design', percentage: 88, colorScheme: 'blue' },
+    { skill: 'Website Banner Design', percentage: 91, colorScheme: 'orange' },
+    { skill: 'Photo Manipulation', percentage: 89, colorScheme: 'red' },
+    { skill: 'Image Editing', percentage: 93, colorScheme: 'blue' },
+    { skill: 'Business Card Design', percentage: 87, colorScheme: 'orange' },
+    { skill: 'Visiting Card Design', percentage: 86, colorScheme: 'red' }
   ]
 
   return (
@@ -145,35 +150,7 @@ export default function About() {
             </MotionBox>
           </Grid>
 
-          {/* Stats Section */}
-          <MotionBox
-            bg="rgba(255, 255, 255, 0.1)"
-            p={12}
-            borderRadius="2xl"
-            w="full"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <Grid templateColumns={{ base: '1fr', md: 'repeat(4, 1fr)' }} gap={8} textAlign="center">
-              <VStack>
-                <Heading fontSize="4xl" color="brand.red" fontFamily="heading">500+</Heading>
-                <Text fontWeight="600" fontFamily="accent">Projects Completed</Text>
-              </VStack>
-              <VStack>
-                <Heading fontSize="4xl" color="brand.blue" fontFamily="heading">200+</Heading>
-                <Text fontWeight="600" fontFamily="accent">Happy Clients</Text>
-              </VStack>
-              <VStack>
-                <Heading fontSize="4xl" color="brand.brown" fontFamily="heading">2+</Heading>
-                <Text fontWeight="600" fontFamily="accent">Years Experience</Text>
-              </VStack>
-              <VStack>
-                <Heading fontSize="4xl" color="brand.red" fontFamily="heading">24h</Heading>
-                <Text fontWeight="600" fontFamily="accent">Average Response</Text>
-              </VStack>
-            </Grid>
-          </MotionBox>
+
         </VStack>
       </Container>
     </Box>

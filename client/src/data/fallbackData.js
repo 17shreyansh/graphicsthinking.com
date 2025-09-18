@@ -15,7 +15,7 @@ export const fallbackPortfolioData = [
     projectDate: new Date('2024-01-15'),
     featured: true,
     views: 245,
-    likes: 18
+    likes: 2
   },
   {
     _id: 'fallback-2', 
@@ -33,7 +33,7 @@ export const fallbackPortfolioData = [
     projectDate: new Date('2024-02-10'),
     featured: true,
     views: 189,
-    likes: 24
+    likes: 1
   },
   {
     _id: 'fallback-3',
@@ -51,7 +51,7 @@ export const fallbackPortfolioData = [
     projectDate: new Date('2024-01-28'),
     featured: true,
     views: 156,
-    likes: 12
+    likes: 3
   },
   {
     _id: 'fallback-4',
@@ -69,7 +69,7 @@ export const fallbackPortfolioData = [
     projectDate: new Date('2024-03-05'),
     featured: true,
     views: 298,
-    likes: 31
+    likes: 2
   },
   {
     _id: 'fallback-5',
@@ -87,7 +87,7 @@ export const fallbackPortfolioData = [
     projectDate: new Date('2024-02-20'),
     featured: true,
     views: 203,
-    likes: 27
+    likes: 1
   },
   {
     _id: 'fallback-6',
@@ -105,7 +105,7 @@ export const fallbackPortfolioData = [
     projectDate: new Date('2024-03-12'),
     featured: true,
     views: 167,
-    likes: 15
+    likes: 2
   }
 ]
 

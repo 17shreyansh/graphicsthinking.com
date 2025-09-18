@@ -56,7 +56,7 @@ export default function Logo({ size = 'md' }) {
         <MotionText
           fontSize={sizes[size].fontSize}
           fontFamily="heading"
-          color="brand.red"
+          color="#ffcccc"
           lineHeight="0.9"
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.2 }}
@@ -66,7 +66,7 @@ export default function Logo({ size = 'md' }) {
         <Text
           fontSize={size === 'lg' ? 'lg' : size === 'md' ? 'sm' : 'xs'}
           fontFamily="accent"
-          color="brand.brown"
+          color="#ffd8bd"
           fontWeight="600"
           letterSpacing="wider"
         >

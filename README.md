@@ -110,9 +110,9 @@ Access the admin panel at `/admin` to manage:
 
 Configure email settings in `.env`:
 ```env
-EMAIL_USER=your-email@gmail.com
+EMAIL_USER=devsaxena285@gmail.com
 EMAIL_PASS=your-app-password
-CONTACT_EMAIL=hello@graphicsthinking.com
+CONTACT_EMAIL=devsaxena285@gmail.com
 ```
 
 ## 🚀 Deployment
@@ -137,4 +137,4 @@ This project is licensed under the MIT License.
 
 ## 🤝 Support
 
-For support, email hello@graphicsthinking.com or create an issue in the repository.
+For support, email devsaxena285@gmail.com or create an issue in the repository.

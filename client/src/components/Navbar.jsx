@@ -63,7 +63,6 @@ export default function Navbar() {
           <NavLink to="/about">About</NavLink>
           <NavLink to="/portfolio">Portfolio</NavLink>
           <NavLink to="/services">Services</NavLink>
-          <NavLink to="/blog">Blog</NavLink>
           <NavLink to="/contact">Contact</NavLink>
         </HStack>
 
@@ -90,7 +89,6 @@ export default function Navbar() {
             <NavLink to="/about">About</NavLink>
             <NavLink to="/portfolio">Portfolio</NavLink>
             <NavLink to="/services">Services</NavLink>
-            <NavLink to="/blog">Blog</NavLink>
             <NavLink to="/contact">Contact</NavLink>
           </Stack>
         </MotionBox>

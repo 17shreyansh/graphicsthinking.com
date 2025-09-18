@@ -100,13 +100,13 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <Text as="span" color="brand.brown">
+            <Text as="span" color="#ffd8bd">
               CREATIVE
             </Text>
-            <Text as="span" color="brand.red" display="block">
+            <Text as="span" color="#ffcccc" display="block">
               DESIGN
             </Text>
-            <Text as="span" color="brand.blue">
+            <Text as="span" color="#cae5ff">
               SOLUTIONS
             </Text>
           </MotionHeading>

@@ -153,8 +153,8 @@ export default function Portfolio() {
             <Heading fontSize="4xl" fontFamily="heading">
               OUR PORTFOLIO
             </Heading>
-            <Text fontSize="lg" color="gray.600" maxW="600px">
-              Explore our diverse collection of creative projects spanning various industries and design disciplines.
+            <Text fontSize="lg" color="brand.blue" maxW="600px">
+              Explore our services
             </Text>
           </VStack>
 
@@ -169,15 +169,15 @@ export default function Portfolio() {
             
             <HStack spacing={4} flexWrap="wrap" justify="center">
               {categories.map((category, index) => {
-                const colors = ['red', 'blue', 'orange']
-                const colorScheme = colors[index % 3]
                 return (
                   <Button
                     key={category}
                     variant={activeCategory === category ? 'solid' : 'outline'}
-                    colorScheme={colorScheme}
+                    bg={activeCategory === category ? '#ffcccc' : 'transparent'}
+                    color={activeCategory === category ? 'black' : '#ffcccc'}
+                    borderColor="#ffcccc"
                     onClick={() => setActiveCategory(category)}
-                    _hover={{ transform: 'translateY(-2px)' }}
+                    _hover={{ transform: 'translateY(-2px)', bg: '#ffcccc', color: 'black' }}
                     fontFamily="accent"
                     fontWeight="600"
                   >

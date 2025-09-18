@@ -49,11 +49,11 @@ export default function Footer() {
             <Text fontWeight="600" fontFamily="accent">Contact</Text>
             <HStack>
               <Icon as={FaEnvelope} />
-              <Text color="gray.400" fontSize="sm">hello@graphicsthinking.com</Text>
+              <Text color="gray.400" fontSize="sm">devsaxena285@gmail.com</Text>
             </HStack>
             <HStack>
               <Icon as={FaPhone} />
-              <Text color="gray.400" fontSize="sm">+1 (555) 123-4567</Text>
+              <Text color="gray.400" fontSize="sm">9205900592</Text>
             </HStack>
           </VStack>
         </Grid>

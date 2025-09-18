@@ -132,7 +132,7 @@ export default function Services() {
       <Container maxW="7xl" position="relative" zIndex={1}>
         <VStack spacing={16}>
           <VStack spacing={4} textAlign="center">
-            <Heading fontSize="4xl" fontFamily="heading">
+            <Heading fontSize="4xl" fontFamily="body" fontWeight="800">
               OUR SERVICES
             </Heading>
             <Text fontSize="lg" color="gray.300" maxW="600px">
@@ -168,7 +168,7 @@ export default function Services() {
             transition={{ duration: 0.3 }}
           >
             <VStack spacing={6}>
-              <Heading fontSize="3xl" fontFamily="heading">
+              <Heading fontSize="3xl" fontFamily="body" fontWeight="800">
                 NEED SOMETHING CUSTOM?
               </Heading>
               <Text fontSize="lg" maxW="500px">
