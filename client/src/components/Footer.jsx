@@ -60,19 +60,28 @@ export default function Footer() {
 
         <Divider my={8} borderColor="gray.700" />
         
-        <HStack justify="space-between" flexWrap="wrap">
-          <Text color="gray.400" fontSize="sm">
-            © 2024 Graphics Thinking. All rights reserved.
-          </Text>
-          <HStack spacing={6}>
-            <Link href="#" color="gray.400" fontSize="sm" _hover={{ color: 'white' }}>
-              Privacy Policy
-            </Link>
-            <Link href="#" color="gray.400" fontSize="sm" _hover={{ color: 'white' }}>
-              Terms of Service
-            </Link>
+        <VStack spacing={4}>
+          <HStack justify="space-between" flexWrap="wrap" w="full">
+            <Text color="gray.400" fontSize="sm">
+              © 2024 Graphics Thinking. All rights reserved.
+            </Text>
+            <HStack spacing={6}>
+              <Link href="#" color="gray.400" fontSize="sm" _hover={{ color: 'white' }}>
+                Privacy Policy
+              </Link>
+              <Link href="#" color="gray.400" fontSize="sm" _hover={{ color: 'white' }}>
+                Terms of Service
+              </Link>
+            </HStack>
           </HStack>
-        </HStack>
+          
+          <Text color="gray.500" fontSize="xs" textAlign="center">
+            Made with ❤️ and craft by{' '}
+            <Link href="https://affobe.com/" isExternal color="brand.red" _hover={{ color: 'brand.blue' }}>
+              Affobe
+            </Link>
+          </Text>
+        </VStack>
       </Container>
     </Box>
   )
