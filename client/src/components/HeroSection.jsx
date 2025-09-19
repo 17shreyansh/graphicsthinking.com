@@ -94,10 +94,9 @@ export default function HeroSection() {
           <MotionHeading
             fontSize={{ base: '4xl', md: '6xl', lg: '7xl' }}
             fontFamily="heading"
-            lineHeight="0.9"
+            lineHeight="1"
             color="white"
             letterSpacing="0.1em"
-            wordSpacing="0.2em"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
