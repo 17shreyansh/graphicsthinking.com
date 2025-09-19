@@ -96,7 +96,7 @@ export default function FeaturedWork() {
       <Box bg="white" py={20}>
         <Container maxW="7xl">
           <VStack spacing={8}>
-            <Heading fontSize={{ base: '3xl', md: '4xl' }} fontFamily="heading" textAlign="center">
+            <Heading fontSize={{ base: '3xl', md: '4xl' }} fontFamily="body" fontWeight="800" textAlign="center">
               FEATURED WORK
             </Heading>
             <Spinner size="xl" color="brand.red" />
@@ -137,7 +137,7 @@ export default function FeaturedWork() {
       <Container maxW="7xl" position="relative" zIndex={1}>
         <VStack spacing={12}>
           <VStack spacing={4} textAlign="center">
-            <Heading fontSize={{ base: '3xl', md: '4xl' }} fontFamily="heading" color="black">
+            <Heading fontSize={{ base: '3xl', md: '4xl' }} fontFamily="body" fontWeight="800" color="black">
               FEATURED WORK
             </Heading>
             <Text fontSize="lg" color="black">

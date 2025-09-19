@@ -127,7 +127,7 @@ export default function ServicesSection() {
       <Container maxW="7xl" position="relative" zIndex={1}>
         <VStack spacing={16}>
           <VStack spacing={4} textAlign="center">
-            <Heading fontSize="4xl" fontFamily="heading" color="white">
+            <Heading fontSize="4xl" fontFamily="body" fontWeight="800" color="white">
               OUR SERVICES
             </Heading>
             <Text fontSize="lg" color="gray.300" maxW="600px">

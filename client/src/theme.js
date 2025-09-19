@@ -12,6 +12,7 @@ const theme = extendTheme({
       redDark: '#C53030',
       blueDark: '#2C5282',
       brownDark: '#744210',
+      s: '#cae5ff',
       50: '#FFF5F5',
       100: '#FED7D7',
       200: '#FEB2B2',
@@ -21,7 +22,7 @@ const theme = extendTheme({
       600: '#C53030',
       700: '#9B2C2C',
       800: '#822727',
-      900: '#63171B'
+      900: '#63171B',
     }
   },
   fonts: {

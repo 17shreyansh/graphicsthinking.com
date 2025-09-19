@@ -40,7 +40,7 @@ export default function CTASection() {
       />
       <Container maxW="7xl" position="relative" zIndex={1}>
         <VStack spacing={8} textAlign="center">
-          <Heading fontSize={{ base: '3xl', md: '4xl' }} fontFamily="heading">
+          <Heading fontSize={{ base: '3xl', md: '4xl' }} fontFamily="body" fontWeight="800">
             READY TO START YOUR PROJECT?
           </Heading>
           

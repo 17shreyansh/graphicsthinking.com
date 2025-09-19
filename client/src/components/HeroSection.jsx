@@ -96,6 +96,8 @@ export default function HeroSection() {
             fontFamily="heading"
             lineHeight="0.9"
             color="white"
+            letterSpacing="0.1em"
+            wordSpacing="0.2em"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}

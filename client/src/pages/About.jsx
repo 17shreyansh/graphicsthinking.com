@@ -64,7 +64,7 @@ export default function About() {
               transition={{ duration: 0.8 }}
             >
               <VStack align="start" spacing={6}>
-                <Heading fontSize="4xl" fontFamily="heading">
+                <Heading fontSize="4xl" fontFamily="body" fontWeight="800">
                   ABOUT GRAPHICS THINKING
                 </Heading>
                 <Text fontSize="lg" color="gray.300">
@@ -103,7 +103,7 @@ export default function About() {
               transition={{ duration: 0.8 }}
             >
               <VStack align="start" spacing={6}>
-                <Heading size="xl" fontFamily="heading">OUR EXPERTISE</Heading>
+                <Heading size="xl" fontFamily="body" fontWeight="800">OUR EXPERTISE</Heading>
                 <Text color="gray.300">
                   We specialize in various aspects of graphic design, bringing expertise 
                   and creativity to every project we undertake.
@@ -130,7 +130,7 @@ export default function About() {
               transition={{ duration: 0.8 }}
             >
               <VStack align="start" spacing={6}>
-                <Heading size="xl" fontFamily="heading">OUR PHILOSOPHY</Heading>
+                <Heading size="xl" fontFamily="body" fontWeight="800">OUR PHILOSOPHY</Heading>
                 <Text color="gray.300">
                   "Design is not just what it looks like and feels like. Design is how it works." 
                   - Steve Jobs
@@ -141,10 +141,10 @@ export default function About() {
                   visual solutions that not only capture attention but also drive action.
                 </Text>
                 <VStack align="start" spacing={3}>
-                  <Text fontWeight="600" color="brand.red">✓ Strategic Design Approach</Text>
-                  <Text fontWeight="600" color="brand.blue">✓ Client-Centered Process</Text>
-                  <Text fontWeight="600" color="brand.brown">✓ Quality & Attention to Detail</Text>
-                  <Text fontWeight="600" color="brand.red">✓ Timely Project Delivery</Text>
+                  <Text fontWeight="600" color="brand.s">✓ Strategic Design Approach</Text>
+                  <Text fontWeight="600" color="brand.s">✓ Client-Centered Process</Text>
+                  <Text fontWeight="600" color="brand.s">✓ Quality & Attention to Detail</Text>
+                  <Text fontWeight="600" color="brand.s">✓ Timely Project Delivery</Text>
                 </VStack>
               </VStack>
             </MotionBox>

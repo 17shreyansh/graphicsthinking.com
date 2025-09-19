@@ -150,7 +150,7 @@ export default function Portfolio() {
       <Container maxW="7xl" position="relative" zIndex={1}>
         <VStack spacing={12}>
           <VStack spacing={4} textAlign="center">
-            <Heading fontSize="4xl" fontFamily="heading">
+            <Heading fontSize="4xl" fontFamily="body" fontWeight="800">
               OUR PORTFOLIO
             </Heading>
             <Text fontSize="lg" color="brand.blue" maxW="600px">
