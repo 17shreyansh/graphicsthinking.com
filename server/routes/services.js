@@ -106,7 +106,7 @@ router.get('/', async (req, res) => {
     // Add computed fields and expose slug
     const enrichedServices = services.map(service => ({
       ...service,
-      slug: service.seo?.slug,
+      slug: service.seo?.slug || service._id,
       discountPercentage: service.pricing?.originalPrice && service.pricing.originalPrice > service.pricing.basePrice
         ? Math.round(((service.pricing.originalPrice - service.pricing.basePrice) / service.pricing.originalPrice) * 100)
         : 0
@@ -195,7 +195,18 @@ router.get('/:identifier', async (req, res) => {
       { $project: { detailedDescription: 0, requirements: 0 } }
     ])
     
-    res.json({ service, related })
+    // Ensure slug is exposed in response
+    const enrichedService = {
+      ...service.toObject(),
+      slug: service.seo?.slug || service._id
+    }
+    
+    const enrichedRelated = related.map(item => ({
+      ...item,
+      slug: item.seo?.slug || item._id
+    }))
+    
+    res.json({ service: enrichedService, related: enrichedRelated })
   } catch (error) {
     console.error('Service detail error:', error)
     res.status(500).json({ message: 'Failed to fetch service details' })
