@@ -20,7 +20,7 @@ app.use(helmet())
 app.use(compression())
 app.use(morgan('combined'))
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173'],
+  origin: ['http://localhost:3000', 'http://localhost:5173','https://www.thegraphicsthinking.com', 'https://thegraphicsthinking.com'],
   credentials: true
 }))
 app.use(express.json({ limit: '10mb' }))
