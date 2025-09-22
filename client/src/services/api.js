@@ -21,7 +21,7 @@ api.interceptors.response.use(
   (response) => response.data,
   (error) => {
     console.error('API Error:', error.response?.data || error.message)
-    return Promise.reject(error.response?.data || error)
+    return Promise.reject(error.response?.data || { message: error.message })
   }
 )
 
@@ -39,17 +39,17 @@ export const portfolioAPI = {
 export const servicesAPI = {
   getAll: () => api.get('/services'),
   getById: (id) => api.get(`/services/${id}`),
+  getBySlug: (slug) => api.get(`/services/${slug}`),
   create: (data) => api.post('/services', data),
   update: (id, data) => api.put(`/services/${id}`, data),
   delete: (id) => api.delete(`/services/${id}`)
 }
 
-export const blogAPI = {
-  getAll: () => api.get('/blog'),
-  getById: (id) => api.get(`/blog/${id}`),
-  create: (data) => api.post('/blog', data),
-  update: (id, data) => api.put(`/blog/${id}`, data),
-  delete: (id) => api.delete(`/blog/${id}`)
+export const adminAPI = {
+  getStats: () => api.get('/admin/stats'),
+  getRecent: () => api.get('/admin/recent'),
+  bulkAction: (type, action, ids) => api.post('/admin/bulk-action', { type, action, ids }),
+  export: (type, format) => api.get(`/admin/export/${type}?format=${format}`)
 }
 
 export const contactAPI = {
@@ -67,7 +67,7 @@ export const uploadAPI = {
   uploadImage: (file) => {
     const formData = new FormData()
     formData.append('image', file)
-    return api.post('/upload/image', formData, {
+    return api.post('/upload/single', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -76,13 +76,12 @@ export const uploadAPI = {
   uploadImages: (files) => {
     const formData = new FormData()
     files.forEach(file => formData.append('images', file))
-    return api.post('/upload/images', formData, {
+    return api.post('/upload/multiple', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
-  },
-  deleteImage: (filename) => api.delete(`/upload/image/${filename}`)
+  }
 }
 
 export default api

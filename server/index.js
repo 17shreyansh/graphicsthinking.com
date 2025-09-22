@@ -20,27 +20,47 @@ app.use(helmet())
 app.use(compression())
 app.use(morgan('combined'))
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true
 }))
 app.use(express.json({ limit: '10mb' }))
 app.use('/uploads', express.static('uploads'))
+app.use('/api/upload', require('./routes/upload'))
 
 // Rate Limiting (disabled for development)
 // app.use('/api/', generalLimiter)
 // app.use('/api/contact', contactLimiter)
 
 // Routes with Caching
-app.use('/api/portfolio', cacheMiddleware(300), require('./routes/portfolio'))
+app.use('/api/portfolio', require('./routes/portfolio'))
 app.use('/api/services', cacheMiddleware(600), require('./routes/services'))
 app.use('/api/testimonials', cacheMiddleware(600), require('./routes/testimonials'))
 app.use('/api/contact', require('./routes/contact'))
-app.use('/api/upload', require('./routes/upload'))
 app.use('/api/admin', require('./routes/admin'))
 
 // Health Check
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() })
+})
+
+// Debug endpoint
+app.get('/api/debug', async (req, res) => {
+  try {
+    const Portfolio = require('./models/Portfolio')
+    const Service = require('./models/Service')
+    const portfolioCount = await Portfolio.countDocuments()
+    const serviceCount = await Service.countDocuments()
+    const services = await Service.find({}).limit(5)
+    res.json({ 
+      portfolioCount, 
+      serviceCount,
+      sampleServices: services,
+      dbConnected: true,
+      timestamp: new Date().toISOString()
+    })
+  } catch (error) {
+    res.status(500).json({ error: error.message, dbConnected: false })
+  }
 })
 
 // Error Handler

@@ -11,7 +11,6 @@ import {
   FaWhatsapp, FaEnvelope, FaPhone
 } from 'react-icons/fa'
 import { servicesAPI } from '../services/api'
-import { fallbackServicesData } from '../data/fallbackData'
 import Loading from '../components/Loading'
 
 const MotionBox = motion(Box)
@@ -81,7 +80,7 @@ const PackageCard = ({ package: pkg, isPopular, onSelect }) => (
 )
 
 export default function ServiceDetail() {
-  const { id } = useParams()
+  const { slug } = useParams()
   const [service, setService] = useState(null)
   const [related, setRelated] = useState([])
   const [loading, setLoading] = useState(true)
@@ -89,29 +88,18 @@ export default function ServiceDetail() {
 
   useEffect(() => {
     fetchServiceDetail()
-  }, [id])
+  }, [slug])
 
   const fetchServiceDetail = async () => {
     setLoading(true)
     try {
-      const response = await servicesAPI.getById(id)
+      const response = await servicesAPI.getBySlug(slug)
       setService(response.service)
       setRelated(response.related || [])
     } catch (error) {
-      const fallbackItem = fallbackServicesData.find(item => item._id === id)
-      if (fallbackItem) {
-        setService({
-          ...fallbackItem,
-          name: fallbackItem.title,
-          category: 'Design Services',
-          rating: 4.8,
-          totalOrders: 150,
-          deliveryTime: fallbackItem.duration,
-          revisions: 'Unlimited',
-          features: fallbackItem.features
-        })
-        setRelated(fallbackServicesData.filter(item => item._id !== id).slice(0, 3))
-      }
+      console.error('Failed to fetch service details:', error)
+      setService(null)
+      setRelated([])
     } finally {
       setLoading(false)
     }
@@ -192,9 +180,9 @@ export default function ServiceDetail() {
                   <HStack spacing={4}>
                     <HStack>
                       <Icon as={FaStar} color="yellow.400" />
-                      <Text fontWeight="600">{service.rating}/5</Text>
+                      <Text fontWeight="600">{service.metrics?.rating || service.rating || 5}/5</Text>
                     </HStack>
-                    <Text color="gray.300">({service.totalOrders} orders completed)</Text>
+                    <Text color="gray.300">({service.metrics?.totalOrders || service.totalOrders || 0} orders completed)</Text>
                   </HStack>
                   
                   <Text color="gray.300" fontSize="lg" lineHeight="1.8">
@@ -245,7 +233,7 @@ export default function ServiceDetail() {
                       
                       <TabPanel px={0}>
                         <List spacing={3}>
-                          {service.features.map((feature, index) => (
+                          {(service.features || []).map((feature, index) => (
                             <ListItem key={index}>
                               <ListIcon as={FaCheck} color="green.500" />
                               {feature}
@@ -302,7 +290,7 @@ export default function ServiceDetail() {
                         <Icon as={FaClock} color="brand.blue" />
                         <Text fontWeight="600">Delivery:</Text>
                       </HStack>
-                      <Text color="gray.300">{service.deliveryTime}</Text>
+                      <Text color="gray.300">{service.delivery?.estimatedDays ? `${service.delivery.estimatedDays} days` : service.deliveryTime || '7 days'}</Text>
                     </HStack>
                     
                     <HStack justify="space-between" w="full">
@@ -310,7 +298,7 @@ export default function ServiceDetail() {
                         <Icon as={FaRedo} color="brand.brown" />
                         <Text fontWeight="600">Revisions:</Text>
                       </HStack>
-                      <Text color="gray.300">{service.revisions}</Text>
+                      <Text color="gray.300">{service.delivery?.revisions || service.revisions || 3}</Text>
                     </HStack>
                   </VStack>
                 </Box>
@@ -373,7 +361,7 @@ export default function ServiceDetail() {
                     <MotionBox
                       key={item._id}
                       as={RouterLink}
-                      to={`/services/${item._id}`}
+                      to={`/services/${item.slug || item.seo?.slug || item._id}`}
                       whileHover={{ y: -5 }}
                       transition={{ duration: 0.3 }}
                     >

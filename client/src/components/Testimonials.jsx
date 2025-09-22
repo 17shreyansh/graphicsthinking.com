@@ -1,6 +1,7 @@
-import { Box, Container, Heading, Text, VStack, HStack, Avatar, Grid } from '@chakra-ui/react'
+import { Box, Container, Heading, Text, VStack, HStack, Avatar, Grid, Spinner } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { FaStar } from 'react-icons/fa'
+import { testimonialsAPI } from '../services/api'
 
 const MotionBox = motion(Box)
 
@@ -52,23 +53,38 @@ const TestimonialCard = ({ testimonial, colorScheme = 'red' }) => {
 }
 
 export default function Testimonials() {
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      company: "Tech Startup CEO",
-      content: "Graphics Thinking transformed our brand identity completely. Their creative approach and attention to detail exceeded our expectations."
-    },
-    {
-      name: "Mike Chen",
-      company: "Restaurant Owner",
-      content: "The social media designs they created for us increased our engagement by 300%. Absolutely professional and creative work."
-    },
-    {
-      name: "Emily Davis",
-      company: "Fashion Brand",
-      content: "Working with Graphics Thinking was a game-changer. They understood our vision and delivered designs that perfectly captured our brand essence."
+  const [testimonials, setTestimonials] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const response = await testimonialsAPI.getAll()
+        setTestimonials(response.testimonials || response || [])
+      } catch (error) {
+        console.error('Failed to fetch testimonials:', error)
+        setTestimonials([])
+      }
+      setLoading(false)
     }
-  ]
+
+    fetchTestimonials()
+  }, [])
+
+  if (loading) {
+    return (
+      <Box bg="gray.50" py={20}>
+        <Container maxW="7xl">
+          <VStack spacing={8}>
+            <Heading fontSize="4xl" fontFamily="heading">
+              CLIENT TESTIMONIALS
+            </Heading>
+            <Spinner size="xl" color="brand.red" />
+          </VStack>
+        </Container>
+      </Box>
+    )
+  }
 
   return (
     <Box bg="gray.50" py={20}>
@@ -83,21 +99,27 @@ export default function Testimonials() {
             </Text>
           </VStack>
 
-          <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={8}>
-            {testimonials.map((testimonial, index) => {
-              const colors = ['red', 'blue', 'brown']
-              return (
-                <MotionBox
-                  key={index}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.2 }}
-                >
-                  <TestimonialCard testimonial={testimonial} colorScheme={colors[index]} />
-                </MotionBox>
-              )
-            })}
-          </Grid>
+          {testimonials.length > 0 ? (
+            <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={8}>
+              {testimonials.map((testimonial, index) => {
+                const colors = ['red', 'blue', 'brown']
+                return (
+                  <MotionBox
+                    key={testimonial._id || index}
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.2 }}
+                  >
+                    <TestimonialCard testimonial={testimonial} colorScheme={colors[index]} />
+                  </MotionBox>
+                )
+              })}
+            </Grid>
+          ) : (
+            <Text color="gray.600" textAlign="center">
+              No testimonials available at the moment.
+            </Text>
+          )}
         </VStack>
       </Container>
     </Box>

@@ -7,7 +7,7 @@ import {
 import { motion } from 'framer-motion'
 import { FaArrowLeft, FaEye, FaHeart, FaExternalLinkAlt, FaCalendar, FaUser } from 'react-icons/fa'
 import { portfolioAPI } from '../services/api'
-import { fallbackPortfolioData } from '../data/fallbackData'
+
 import Loading from '../components/Loading'
 
 const MotionBox = motion(Box)
@@ -27,15 +27,19 @@ export default function PortfolioDetail() {
   const fetchPortfolioDetail = async () => {
     setLoading(true)
     try {
-      const response = await portfolioAPI.getById(id)
+      // Try slug first, then fallback to ID
+      let response
+      try {
+        response = await fetch(`http://localhost:5000/api/portfolio/slug/${id}`).then(r => r.json())
+      } catch {
+        response = await portfolioAPI.getById(id)
+      }
       setPortfolio(response.portfolio)
       setRelated(response.related || [])
     } catch (error) {
-      const fallbackItem = fallbackPortfolioData.find(item => item._id === id)
-      if (fallbackItem) {
-        setPortfolio(fallbackItem)
-        setRelated(fallbackPortfolioData.filter(item => item._id !== id && item.category === fallbackItem.category).slice(0, 3))
-      }
+      console.error('Failed to fetch portfolio item:', error)
+      setPortfolio(null)
+      setRelated([])
     } finally {
       setLoading(false)
     }

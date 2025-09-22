@@ -11,7 +11,7 @@ import {
   FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp
 } from 'react-icons/fa'
 import { blogAPI } from '../services/api'
-import { fallbackBlogData } from '../data/fallbackData'
+
 import Loading from '../components/Loading'
 import EditorJSRenderer from '../components/EditorJSRenderer'
 
@@ -50,17 +50,9 @@ export default function BlogDetail() {
       setPost(response.post)
       setRelated(response.related || [])
     } catch (error) {
-      const fallbackItem = fallbackBlogData.find(item => item._id === slug)
-      if (fallbackItem) {
-        setPost({
-          ...fallbackItem,
-          category: 'Design Tips',
-          views: 245,
-          likes: 18,
-          featured: true
-        })
-        setRelated(fallbackBlogData.filter(item => item._id !== slug).slice(0, 3))
-      }
+      console.error('Failed to fetch blog post:', error)
+      setPost(null)
+      setRelated([])
     } finally {
       setLoading(false)
     }

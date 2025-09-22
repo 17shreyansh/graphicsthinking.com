@@ -5,7 +5,7 @@ import {
 import { motion } from 'framer-motion'
 import { Link as RouterLink } from 'react-router-dom'
 import { blogAPI } from '../services/api'
-import { fallbackBlogData } from '../data/fallbackData'
+
 
 const MotionBox = motion(Box)
 
@@ -52,10 +52,8 @@ export default function Blog() {
       const response = await blogAPI.getAll()
       setPosts(response.posts || response || [])
     } catch (error) {
-      setPosts(fallbackBlogData.map(post => ({
-        ...post,
-        slug: post._id
-      })))
+      console.error('Failed to fetch blog posts:', error)
+      setPosts([])
     }
   }
 

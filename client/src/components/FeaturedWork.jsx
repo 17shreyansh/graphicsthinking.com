@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { portfolioAPI } from '../services/api'
 import LazyImage from './LazyImage'
-import { fallbackPortfolioData } from '../data/fallbackData'
+
 
 const MotionBox = motion(Box)
 
@@ -80,10 +80,10 @@ export default function FeaturedWork() {
         if (response?.items?.length > 0) {
           setPortfolioItems(response.items)
         } else {
-          setPortfolioItems(fallbackPortfolioData)
+          setPortfolioItems([])
         }
       } catch (err) {
-        setPortfolioItems(fallbackPortfolioData)
+        setPortfolioItems([])
       }
       setLoading(false)
     }

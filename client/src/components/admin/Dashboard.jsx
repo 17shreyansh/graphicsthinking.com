@@ -1,115 +1,119 @@
-import { Row, Col, Card, Statistic, Typography, Button, Image, Tag } from 'antd'
-import { FileImageOutlined, AppstoreOutlined, EditOutlined, MessageOutlined } from '@ant-design/icons'
+import { useState, useEffect } from 'react'
+import { Card, Row, Col, Statistic, List, Avatar, Badge, Spin, Alert } from 'antd'
+import { UserOutlined, ProjectOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
+import { adminApiService } from '../../services/adminApi'
 
-const { Title, Text } = Typography
+export default function Dashboard() {
+  const [stats, setStats] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-const Dashboard = ({ stats, portfolioItems, messages, onMenuSelect }) => {
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true)
+      console.log('Fetching dashboard stats...')
+      const data = await adminApiService.dashboard.getStats()
+      console.log('Dashboard API response:', data)
+      setStats(data)
+    } catch (err) {
+      console.error('Dashboard fetch error:', err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) return <Spin size="large" style={{ display: 'block', margin: '50px auto' }} />
+  if (error) return <Alert message="Error" description={error} type="error" showIcon />
+
   return (
     <div>
-      <Title level={2}>Dashboard</Title>
-      <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={6}>
-          <Card style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <Statistic 
-              title="Portfolio Items" 
-              value={stats.totalPortfolio} 
-              prefix={<FileImageOutlined style={{ color: '#667eea' }} />}
-              valueStyle={{ color: '#667eea' }}
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Portfolio Items"
+              value={stats?.portfolio.total || 0}
+              prefix={<ProjectOutlined />}
+              suffix={`(${stats?.portfolio.featured || 0} featured)`}
             />
           </Card>
         </Col>
-        <Col span={6}>
-          <Card style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <Statistic 
-              title="Services" 
-              value={stats.totalServices} 
-              prefix={<AppstoreOutlined style={{ color: '#10b981' }} />}
-              valueStyle={{ color: '#10b981' }}
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Services"
+              value={stats?.services.total || 0}
+              prefix={<UserOutlined />}
             />
           </Card>
         </Col>
-        <Col span={6}>
-          <Card style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <Statistic 
-              title="Blog Posts" 
-              value={stats.totalBlogs} 
-              prefix={<EditOutlined style={{ color: '#f59e0b' }} />}
-              valueStyle={{ color: '#f59e0b' }}
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Messages"
+              value={stats?.messages.total || 0}
+              prefix={<MessageOutlined />}
+              suffix={`(${stats?.messages.new || 0} new)`}
             />
           </Card>
         </Col>
-        <Col span={6}>
-          <Card style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <Statistic 
-              title="New Messages" 
-              value={stats.newMessages} 
-              prefix={<MessageOutlined style={{ color: '#ef4444' }} />}
-              valueStyle={{ color: stats.newMessages > 0 ? '#ef4444' : '#6b7280' }}
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Total Content"
+              value={(stats?.portfolio.total || 0) + (stats?.services.total || 0)}
+              prefix={<StarOutlined />}
             />
           </Card>
         </Col>
       </Row>
-      
-      <Row gutter={16}>
-        <Col span={12}>
-          <Card 
-            title="Recent Portfolio Items" 
-            extra={<Button type="link" onClick={() => onMenuSelect('portfolio')}>View All</Button>}
-            style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-          >
-            {portfolioItems.slice(0, 5).map(item => (
-              <div key={item._id} style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                marginBottom: 12,
-                padding: 8,
-                borderRadius: 6,
-                background: '#f8fafc',
-                border: '1px solid #e2e8f0'
-              }}>
-                <Image 
-                  width={40} 
-                  height={40} 
-                  src={item.image || 'https://via.placeholder.com/40'} 
-                  style={{ marginRight: 12, objectFit: 'cover', borderRadius: 4 }} 
-                />
-                <div>
-                  <Text strong>{item.title}</Text>
-                  <br />
-                  <Tag color="blue" size="small">{item.category}</Tag>
-                </div>
-              </div>
-            ))}
+
+      <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+        <Col xs={24} lg={12}>
+          <Card title="Recent Portfolio" size="small">
+            <List
+              itemLayout="horizontal"
+              dataSource={stats?.portfolio.recent || []}
+              renderItem={(item) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar src={item.image} icon={<ProjectOutlined />} />}
+                    title={item.title}
+                    description={item.category}
+                  />
+                  {item.featured && <Badge status="success" text="Featured" />}
+                </List.Item>
+              )}
+            />
           </Card>
         </Col>
-        <Col span={12}>
-          <Card 
-            title="Recent Messages" 
-            extra={<Button type="link" onClick={() => onMenuSelect('messages')}>View All</Button>}
-            style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-          >
-            {messages.slice(0, 5).map(msg => (
-              <div key={msg._id} style={{ 
-                marginBottom: 12,
-                padding: 12,
-                borderRadius: 6,
-                background: '#f8fafc',
-                border: '1px solid #e2e8f0'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text strong>{msg.name}</Text>
-                  <Tag color={msg.status === 'new' ? 'red' : msg.status === 'read' ? 'orange' : 'green'}>
-                    {msg.status}
-                  </Tag>
-                </div>
-                <Text type="secondary" style={{ fontSize: '12px' }}>{msg.subject}</Text>
-              </div>
-            ))}
+        <Col xs={24} lg={12}>
+          <Card title="Recent Messages" size="small">
+            <List
+              itemLayout="horizontal"
+              dataSource={stats?.messages.recent || []}
+              renderItem={(item) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar icon={<MessageOutlined />} />}
+                    title={item.name}
+                    description={item.subject}
+                  />
+                  <Badge 
+                    status={item.status === 'new' ? 'error' : item.status === 'read' ? 'warning' : 'success'} 
+                    text={item.status} 
+                  />
+                </List.Item>
+              )}
+            />
           </Card>
         </Col>
       </Row>
     </div>
   )
 }
-
-export default Dashboard

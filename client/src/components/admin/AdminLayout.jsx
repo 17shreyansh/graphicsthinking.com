@@ -1,102 +1,141 @@
-import { useState } from 'react'
-import { Layout, Menu, Button, Typography } from 'antd'
-import {
-  DashboardOutlined, FileImageOutlined, AppstoreOutlined, 
-  EditOutlined, MessageOutlined, SettingOutlined,
-  MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined
+import { useState, useEffect } from 'react'
+import { Layout, Menu, Button, Typography, Space } from 'antd'
+import { 
+  DashboardOutlined, 
+  ProjectOutlined, 
+  CustomerServiceOutlined, 
+  MessageOutlined,
+  LogoutOutlined 
 } from '@ant-design/icons'
+import Dashboard from './Dashboard'
+import Portfolio from './Portfolio'
+import Services from './Services'
+import Messages from './Messages'
+import AdminAuthPerfect from '../AdminAuthPerfect'
 
 const { Header, Sider, Content } = Layout
-const { Text } = Typography
+const { Title } = Typography
 
-const AdminLayout = ({ children, selectedMenu, onMenuSelect, onLogout }) => {
+export default function AdminLayout() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [selectedKey, setSelectedKey] = useState('dashboard')
   const [collapsed, setCollapsed] = useState(false)
 
+  useEffect(() => {
+    const authStatus = localStorage.getItem('adminAuth')
+    setIsAuthenticated(authStatus === 'true')
+  }, [])
+
+  const handleLogin = () => setIsAuthenticated(true)
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuth')
+    setIsAuthenticated(false)
+  }
+
+  if (!isAuthenticated) {
+    return <AdminAuthPerfect onLogin={handleLogin} />
+  }
+
   const menuItems = [
-    { key: 'dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
-    { key: 'portfolio', icon: <FileImageOutlined />, label: 'Portfolio' },
-    { key: 'services', icon: <AppstoreOutlined />, label: 'Services' },
-    { key: 'messages', icon: <MessageOutlined />, label: 'Messages' },
-    { key: 'settings', icon: <SettingOutlined />, label: 'Settings' }
+    {
+      key: 'dashboard',
+      icon: <DashboardOutlined />,
+      label: 'Dashboard'
+    },
+    {
+      key: 'portfolio',
+      icon: <ProjectOutlined />,
+      label: 'Portfolio'
+    },
+    {
+      key: 'services',
+      icon: <CustomerServiceOutlined />,
+      label: 'Services'
+    },
+    {
+      key: 'messages',
+      icon: <MessageOutlined />,
+      label: 'Messages'
+    }
   ]
 
+  const renderContent = () => {
+    switch (selectedKey) {
+      case 'dashboard':
+        return <Dashboard />
+      case 'portfolio':
+        return <Portfolio />
+      case 'services':
+        return <Services />
+      case 'messages':
+        return <Messages />
+      default:
+        return <Dashboard />
+    }
+  }
+
   return (
-    <div style={{ height: '100vh', overflow: 'hidden' }}>
-      <Layout style={{ height: '100vh' }}>
-        <Sider 
-          trigger={null} 
-          collapsible 
-          collapsed={collapsed} 
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider 
+        collapsible 
+        collapsed={collapsed} 
+        onCollapse={setCollapsed}
+        theme="dark"
+      >
+        <div style={{ 
+          height: 32, 
+          margin: 16, 
+          background: 'rgba(255, 255, 255, 0.3)',
+          borderRadius: 6,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontWeight: 'bold'
+        }}>
+          {collapsed ? 'GT' : 'Graphics Thinking'}
+        </div>
+        <Menu
           theme="dark"
-          style={{
-            position: 'fixed',
-            height: '100vh',
-            left: 0,
-            top: 0,
-            zIndex: 100
-          }}
-        >
-          <div style={{ height: 64, margin: 16, background: 'rgba(255, 255, 255, 0.3)', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ color: 'white', fontWeight: 'bold' }}>{collapsed ? 'GT' : 'GT Admin'}</Text>
-          </div>
-          <Menu
-            theme="dark"
-            mode="inline"
-            selectedKeys={[selectedMenu]}
-            onClick={({ key }) => onMenuSelect(key)}
-            items={menuItems}
-          />
-        </Sider>
+          mode="inline"
+          selectedKeys={[selectedKey]}
+          items={menuItems}
+          onClick={({ key }) => setSelectedKey(key)}
+        />
+      </Sider>
+      
+      <Layout>
+        <Header style={{ 
+          padding: '0 24px', 
+          background: '#fff', 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          boxShadow: '0 1px 4px rgba(0,21,41,.08)'
+        }}>
+          <Title level={4} style={{ margin: 0, textTransform: 'capitalize' }}>
+            {selectedKey}
+          </Title>
+          <Button 
+            type="primary" 
+            danger 
+            icon={<LogoutOutlined />} 
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        </Header>
         
-        <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
-          <Header style={{ 
-            padding: 0, 
-            background: '#fff', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'space-between', 
-            paddingRight: 24,
-            position: 'fixed',
-            top: 0,
-            right: 0,
-            left: collapsed ? 80 : 200,
-            zIndex: 99,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-          }}>
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{ fontSize: '16px', width: 64, height: 64 }}
-            />
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <Text strong>Graphics Thinking Admin</Text>
-              <Button 
-                icon={<LogoutOutlined />} 
-                onClick={onLogout}
-                type="text"
-                danger
-              >
-                Logout
-              </Button>
-            </div>
-          </Header>
-          
-          <Content style={{ 
-            marginTop: 64,
-            padding: '24px 32px', 
-            background: '#f0f2f5',
-            minHeight: 'calc(100vh - 64px)',
-            overflow: 'auto'
-          }}>
-            <div style={{ background: '#fff', padding: 24, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-              {children}
-            </div>
-          </Content>
-        </Layout>
+        <Content style={{ 
+          margin: '24px 16px', 
+          padding: 24, 
+          background: '#fff',
+          borderRadius: 6
+        }}>
+          {renderContent()}
+        </Content>
       </Layout>
-    </div>
+    </Layout>
   )
 }
-
-export default AdminLayout

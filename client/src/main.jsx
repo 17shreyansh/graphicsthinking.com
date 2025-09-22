@@ -6,6 +6,7 @@ import { AppProvider } from './context/AppContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import App from './App.jsx'
 import theme from './theme.js'
+import 'antd/dist/reset.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

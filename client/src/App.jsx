@@ -15,7 +15,6 @@ const ServiceDetail = lazy(() => import('./pages/ServiceDetail'))
 
 const Contact = lazy(() => import('./pages/Contact'))
 const AdminPanel = lazy(() => import('./pages/AdminPanel'))
-const AdminPanelNew = lazy(() => import('./pages/AdminPanelNew'))
 
 const LoadingSpinner = () => (
   <Center h="50vh">
@@ -28,8 +27,7 @@ function App() {
     <Suspense fallback={<LoadingSpinner />}>
       <Routes>
         {/* Admin routes without navbar/footer */}
-        <Route path="/admin" element={<AdminPanelNew />} />
-        <Route path="/admin-old" element={<AdminPanel />} />
+        <Route path="/admin" element={<AdminPanel />} />
         
         {/* Regular routes with navbar/footer */}
         <Route path="/*" element={
@@ -43,7 +41,7 @@ function App() {
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/portfolio/:id" element={<PortfolioDetail />} />
                 <Route path="/services" element={<Services />} />
-                <Route path="/services/:id" element={<ServiceDetail />} />
+                <Route path="/services/:slug" element={<ServiceDetail />} />
 
                 <Route path="/contact" element={<Contact />} />
               </Routes>

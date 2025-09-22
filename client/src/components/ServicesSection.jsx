@@ -7,7 +7,7 @@ import {
 } from 'react-icons/fa'
 import { Link as RouterLink } from 'react-router-dom'
 import { servicesAPI } from '../services/api'
-import { fallbackServicesData } from '../data/fallbackData'
+
 
 const MotionBox = motion(Box)
 
@@ -63,7 +63,7 @@ const ServiceCard = ({ service, index }) => {
       <VStack spacing={2}>
         <Button
           as={RouterLink}
-          to={`/services/${service._id}`}
+          to={`/services/${service.slug || service.seo?.slug || service._id}`}
           bg={colorConfig[colorScheme].icon}
           color="white"
           size="md"
@@ -103,10 +103,8 @@ export default function ServicesSection() {
       const response = await servicesAPI.getAll()
       setServices((response.services || response || []).slice(0, 6))
     } catch (error) {
-      setServices(fallbackServicesData.slice(0, 6).map(service => ({
-        ...service,
-        name: service.title
-      })))
+      console.error('Failed to fetch services:', error)
+      setServices([])
     }
   }
 

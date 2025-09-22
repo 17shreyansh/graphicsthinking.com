@@ -6,7 +6,7 @@ import {
 import { motion } from 'framer-motion'
 import { Link as RouterLink } from 'react-router-dom'
 import { portfolioAPI } from '../services/api'
-import { fallbackPortfolioData } from '../data/fallbackData'
+
 import SearchFilter from '../components/SearchFilter'
 import Loading from '../components/Loading'
 
@@ -116,7 +116,8 @@ export default function Portfolio() {
       const response = await portfolioAPI.getAll()
       setPortfolioItems(response.items || [])
     } catch (error) {
-      setPortfolioItems(fallbackPortfolioData)
+      console.error('Failed to fetch portfolio items:', error)
+      setPortfolioItems([])
     } finally {
       setLoading(false)
     }
@@ -202,7 +203,7 @@ export default function Portfolio() {
                 >
                   <Box
                     as={RouterLink}
-                    to={`/portfolio/${item._id}`}
+                    to={`/portfolio/${item.slug || item.seo?.slug || item._id}`}
                     _hover={{ textDecoration: 'none' }}
                   >
                     <PortfolioItem
