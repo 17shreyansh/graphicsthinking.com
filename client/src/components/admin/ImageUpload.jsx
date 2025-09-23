@@ -1,129 +1,200 @@
-import { useState } from 'react'
-import { Box, Button, Image, VStack, Text, Progress, useToast } from '@chakra-ui/react'
-import { FaUpload, FaTrash } from 'react-icons/fa'
+import { useState, useEffect } from 'react'
+import { Upload, message, Image, Button, Space, Modal, Progress, Card, Typography } from 'antd'
+import { PlusOutlined, DeleteOutlined, EyeOutlined, UploadOutlined } from '@ant-design/icons'
+import { uploadService } from '../../services/uploadService'
 
-export default function ImageUpload({ value, onChange, multiple = false }) {
+const { Text } = Typography
+
+export default function ImageUpload({ 
+  value, 
+  onChange, 
+  category = 'general', 
+  maxCount = 1, 
+  listType = 'picture-card',
+  accept = 'image/*'
+}) {
+  const [fileList, setFileList] = useState([])
+  const [previewVisible, setPreviewVisible] = useState(false)
+  const [previewImage, setPreviewImage] = useState('')
+  const [previewTitle, setPreviewTitle] = useState('')
   const [uploading, setUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const toast = useToast()
 
-  const handleFileUpload = async (files) => {
-    setUploading(true)
-    setUploadProgress(0)
-
-    try {
-      const formData = new FormData()
-      
-      if (multiple) {
-        Array.from(files).forEach(file => formData.append('images', file))
-      } else {
-        formData.append('image', files[0])
+  useEffect(() => {
+    if (value) {
+      if (Array.isArray(value)) {
+        setFileList(value.map((url, index) => ({
+          uid: `-${index}`,
+          name: `image-${index}`,
+          status: 'done',
+          url: url
+        })))
+      } else if (typeof value === 'string') {
+        setFileList([{
+          uid: '-1',
+          name: 'image',
+          status: 'done',
+          url: value
+        }])
       }
+    } else {
+      setFileList([])
+    }
+  }, [value])
 
-      const response = await fetch(`http://localhost:5000/api/upload/${multiple ? 'multiple' : 'single'}`, {
-        method: 'POST',
-        body: formData
-      })
+  const getBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = error => reject(error)
+    })
+  }
 
-      if (response.ok) {
-        const result = await response.json()
-        if (multiple) {
-          const urls = result.files.map(f => `http://localhost:5000${f.url}`)
-          onChange(value ? [...value, ...urls] : urls)
-        } else {
-          onChange(`http://localhost:5000${result.url}`)
+  const handleCancel = () => setPreviewVisible(false)
+
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj)
+    }
+    setPreviewImage(file.url || file.preview)
+    setPreviewVisible(true)
+    setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1))
+  }
+
+  const handleChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList)
+    
+    // Extract URLs from successful uploads
+    const urls = newFileList
+      .filter(file => file.status === 'done')
+      .map(file => {
+        if (file.response && file.response.success) {
+          return `${window.location.protocol}//${window.location.hostname}:5000${file.response.file.url}`
         }
-        toast({ title: 'Upload successful', status: 'success' })
-      } else {
-        toast({ title: 'Upload failed', status: 'error' })
-      }
-      
-      setUploading(false)
-      setUploadProgress(0)
-    } catch (error) {
-      toast({ title: 'Upload failed', description: error.message, status: 'error' })
-      setUploading(false)
-      setUploadProgress(0)
+        return file.url
+      })
+      .filter(Boolean)
+
+    if (maxCount === 1) {
+      onChange(urls[0] || '')
+    } else {
+      onChange(urls)
     }
   }
 
-  const removeImage = (index) => {
-    if (multiple) {
-      const newImages = [...value]
-      newImages.splice(index, 1)
-      onChange(newImages)
-    } else {
-      onChange('')
+  const handleRemove = async (file) => {
+    try {
+      if (file.response && file.response.file.url) {
+        await uploadService.deleteFile(file.response.file.url)
+      }
+      return true
+    } catch (error) {
+      console.error('Error deleting file:', error)
+      message.error('Failed to delete file from server')
+      return false
     }
+  }
+
+  const beforeUpload = (file) => {
+    const validation = uploadService.validateFile(file)
+    if (!validation.isValid) {
+      validation.errors.forEach(error => message.error(error))
+      return false
+    }
+    return true
+  }
+
+  const customRequest = async ({ file, onProgress, onSuccess, onError }) => {
+    try {
+      setUploading(true)
+      
+      // Validate file first
+      const validation = uploadService.validateFile(file)
+      if (!validation.isValid) {
+        throw new Error(validation.errors.join(', '))
+      }
+
+      const result = await uploadService.uploadSingle(file, category, onProgress)
+      
+      if (result.success) {
+        onSuccess(result, file)
+        message.success('Image uploaded successfully!')
+      } else {
+        throw new Error('Upload failed')
+      }
+    } catch (error) {
+      onError(error)
+      message.error('Upload failed: ' + error.message)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  )
+
+  if (listType === 'picture-card') {
+    return (
+      <>
+        <Upload
+          listType="picture-card"
+          fileList={fileList}
+          onPreview={handlePreview}
+          onChange={handleChange}
+          onRemove={handleRemove}
+          beforeUpload={beforeUpload}
+          customRequest={customRequest}
+          accept={accept}
+          maxCount={maxCount}
+        >
+          {fileList.length >= maxCount ? null : uploadButton}
+        </Upload>
+        
+        <Modal
+          open={previewVisible}
+          title={previewTitle}
+          footer={null}
+          onCancel={handleCancel}
+        >
+          <img alt="preview" style={{ width: '100%' }} src={previewImage} />
+        </Modal>
+      </>
+    )
   }
 
   return (
-    <VStack spacing={4} align="stretch">
-      <Box
-        border="2px dashed"
-        borderColor="rgba(255,255,255,0.3)"
-        borderRadius="md"
-        p={6}
-        textAlign="center"
-        cursor="pointer"
-        _hover={{ borderColor: 'brand.red' }}
-        onClick={() => document.getElementById('file-input').click()}
+    <Card>
+      <Upload
+        listType="picture"
+        fileList={fileList}
+        onChange={handleChange}
+        onRemove={handleRemove}
+        beforeUpload={beforeUpload}
+        customRequest={customRequest}
+        accept={accept}
+        maxCount={maxCount}
+        showUploadList={{
+          showPreviewIcon: true,
+          showRemoveIcon: true,
+          showDownloadIcon: false,
+        }}
       >
-        <input
-          id="file-input"
-          type="file"
-          multiple={multiple}
-          accept="image/*"
-          style={{ display: 'none' }}
-          onChange={(e) => handleFileUpload(e.target.files)}
-        />
-        
-        <VStack spacing={2}>
-          <FaUpload size={24} color="gray" />
-          <Text color="gray.300">
-            {uploading ? 'Uploading...' : `Click to upload ${multiple ? 'images' : 'image'}`}
+        <Button icon={<UploadOutlined />} loading={uploading}>
+          {uploading ? 'Uploading...' : 'Select Images'}
+        </Button>
+      </Upload>
+      
+      {fileList.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          <Text type="secondary">
+            {fileList.length} image(s) selected
           </Text>
-          {uploading && <Progress isIndeterminate colorScheme="red" w="100%" />}
-        </VStack>
-      </Box>
-
-      {value && (
-        <Box>
-          {multiple ? (
-            <VStack spacing={2}>
-              {value.map((img, index) => (
-                <Box key={index} position="relative" display="inline-block">
-                  <Image src={img} maxH="100px" borderRadius="md" />
-                  <Button
-                    position="absolute"
-                    top={1}
-                    right={1}
-                    size="xs"
-                    colorScheme="red"
-                    onClick={() => removeImage(index)}
-                  >
-                    <FaTrash />
-                  </Button>
-                </Box>
-              ))}
-            </VStack>
-          ) : (
-            <Box position="relative" display="inline-block">
-              <Image src={value} maxH="200px" borderRadius="md" />
-              <Button
-                position="absolute"
-                top={2}
-                right={2}
-                size="sm"
-                colorScheme="red"
-                onClick={() => removeImage()}
-              >
-                <FaTrash />
-              </Button>
-            </Box>
-          )}
-        </Box>
+        </div>
       )}
-    </VStack>
+    </Card>
   )
 }

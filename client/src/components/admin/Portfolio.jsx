@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Table, Button, Modal, Form, Input, Select, Switch, Space, Popconfirm, message, Image, Tag, InputNumber } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { adminApiService } from '../../services/adminApi'
+import ImageUpload from './ImageUpload'
 
 const { TextArea } = Input
 
@@ -13,27 +14,13 @@ export default function Portfolio() {
   const [form] = Form.useForm()
 
   useEffect(() => {
-    testConnection()
     fetchData()
   }, [])
-
-  const testConnection = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/debug')
-      const data = await response.json()
-      console.log('Server debug info:', data)
-    } catch (error) {
-      console.error('Server connection failed:', error)
-      message.error('Cannot connect to server. Please start the backend.')
-    }
-  }
 
   const fetchData = async () => {
     try {
       setLoading(true)
-      console.log('Fetching portfolio data...')
       const result = await adminApiService.portfolio.getAll()
-      console.log('Portfolio API response:', result)
       setData(result || [])
     } catch (error) {
       console.error('Portfolio fetch error:', error)
@@ -51,15 +38,17 @@ export default function Portfolio() {
   }
 
   const handleEdit = (record) => {
+    console.log('Editing record:', record)
+    console.log('Record _id:', record._id, 'Type:', typeof record._id)
     setEditingItem(record)
-    // Handle nested data structure
     const formData = {
       ...record,
       tags: record.tags?.join(', ') || '',
       technologies: record.technologies?.join(', ') || '',
       images: record.images?.join('\n') || '',
       views: record.metrics?.views || 0,
-      likes: record.metrics?.likes || 0
+      likes: record.metrics?.likes || 0,
+      slug: record.seo?.slug || record.slug || ''
     }
     form.setFieldsValue(formData)
     setModalVisible(true)
@@ -77,22 +66,49 @@ export default function Portfolio() {
 
   const handleSubmit = async (values) => {
     try {
-      console.log('Submitting portfolio data:', values)
       const submitData = {
         ...values,
         tags: values.tags ? values.tags.split(',').map(t => t.trim()).filter(t => t) : [],
         technologies: values.technologies ? values.technologies.split(',').map(t => t.trim()).filter(t => t) : [],
-        images: values.images ? values.images.split('\n').map(i => i.trim()).filter(i => i) : []
+        images: values.images ? values.images.split('\n').map(i => i.trim()).filter(i => i) : [],
+        seo: {
+          slug: values.slug || null
+        }
       }
-      console.log('Transformed data:', submitData)
       
       if (editingItem) {
-        const result = await adminApiService.portfolio.update(editingItem._id, submitData)
-        console.log('Update result:', result)
+        const rawId = editingItem._id || editingItem.id
+        console.log('Raw ID:', rawId, 'Type:', typeof rawId)
+        
+        let id
+        if (typeof rawId === 'object' && rawId !== null) {
+          // Handle MongoDB ObjectId
+          if (rawId.$oid) {
+            id = rawId.$oid
+          } else if (rawId.buffer && typeof rawId.buffer === 'object') {
+            // Convert buffer to hex string
+            const buffer = rawId.buffer
+            id = Object.values(buffer).map(byte => byte.toString(16).padStart(2, '0')).join('')
+          } else if (rawId.toString && typeof rawId.toString === 'function') {
+            const stringId = rawId.toString()
+            id = stringId !== '[object Object]' ? stringId : null
+          } else {
+            id = null
+          }
+        } else {
+          id = String(rawId)
+        }
+        
+        console.log('Converted ID:', id, 'Type:', typeof id)
+        
+        if (!id || typeof id !== 'string' || id === '[object Object]' || id === 'null' || id === 'undefined' || id.length !== 24) {
+          throw new Error(`Invalid ID for update: ${id}`)
+        }
+        
+        await adminApiService.portfolio.update(id, submitData)
         message.success('Portfolio item updated successfully')
       } else {
-        const result = await adminApiService.portfolio.create(submitData)
-        console.log('Create result:', result)
+        await adminApiService.portfolio.create(submitData)
         message.success('Portfolio item created successfully')
       }
       setModalVisible(false)
@@ -155,7 +171,24 @@ export default function Portfolio() {
       render: (_, record) => (
         <Space>
           <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Popconfirm title="Are you sure?" onConfirm={() => handleDelete(record._id)}>
+          <Popconfirm title="Are you sure?" onConfirm={() => {
+            const rawId = record._id || record.id
+            let id
+            if (typeof rawId === 'object' && rawId !== null) {
+              if (rawId.$oid) {
+                id = rawId.$oid
+              } else if (rawId.buffer && typeof rawId.buffer === 'object') {
+                const buffer = rawId.buffer
+                id = Object.values(buffer).map(byte => byte.toString(16).padStart(2, '0')).join('')
+              } else {
+                const stringId = rawId.toString()
+                id = stringId !== '[object Object]' ? stringId : null
+              }
+            } else {
+              id = String(rawId)
+            }
+            handleDelete(id)
+          }}>
             <Button type="primary" danger size="small" icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
@@ -174,7 +207,24 @@ export default function Portfolio() {
       <Table
         columns={columns}
         dataSource={data}
-        rowKey="_id"
+        rowKey={(record) => {
+          const rawKey = record._id || record.id
+          let key
+          if (typeof rawKey === 'object' && rawKey !== null) {
+            if (rawKey.$oid) {
+              key = rawKey.$oid
+            } else if (rawKey.buffer && typeof rawKey.buffer === 'object') {
+              const buffer = rawKey.buffer
+              key = Object.values(buffer).map(byte => byte.toString(16).padStart(2, '0')).join('')
+            } else {
+              const stringKey = rawKey.toString()
+              key = stringKey !== '[object Object]' ? stringKey : null
+            }
+          } else {
+            key = String(rawKey)
+          }
+          return (typeof key === 'string' && key !== '[object Object]' && key !== 'null') ? key : `temp-${Date.now()}-${Math.random()}`
+        }}
         loading={loading}
         pagination={{ pageSize: 10 }}
         scroll={{ x: 1200 }}
@@ -187,9 +237,26 @@ export default function Portfolio() {
         footer={null}
         width={800}
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form form={form} layout="vertical" onFinish={handleSubmit} preserve={false}>
           <Form.Item name="title" label="Title" rules={[{ required: true, max: 200 }]}>
-            <Input placeholder="Enter portfolio title" />
+            <Input 
+              placeholder="Enter portfolio title" 
+              onChange={(e) => {
+                const title = e.target.value
+                const slug = title.toLowerCase()
+                  .replace(/[^a-z0-9\s-]/g, '')
+                  .replace(/\s+/g, '-')
+                  .replace(/-+/g, '-')
+                  .replace(/^-|-$/g, '')
+                if (slug && !editingItem) {
+                  form.setFieldsValue({ slug })
+                }
+              }}
+            />
+          </Form.Item>
+          
+          <Form.Item name="slug" label="URL Slug" rules={[{ pattern: /^[a-z0-9-]+$/, message: 'Only lowercase letters, numbers, and hyphens allowed' }]}>
+            <Input placeholder="url-friendly-slug (auto-generated from title)" />
           </Form.Item>
           
           <Form.Item name="description" label="Description" rules={[{ required: true, max: 500 }]}>
@@ -211,12 +278,22 @@ export default function Portfolio() {
             </Select>
           </Form.Item>
           
-          <Form.Item name="image" label="Primary Image URL" rules={[{ required: true }]}>
-            <Input placeholder="https://example.com/image.jpg" />
+          <Form.Item name="image" label="Primary Image" rules={[{ required: true }]}>
+            <ImageUpload
+              category="portfolio"
+              maxCount={1}
+              value={form.getFieldValue('image')}
+              onChange={(url) => form.setFieldsValue({ image: url })}
+            />
           </Form.Item>
           
-          <Form.Item name="images" label="Additional Images (one per line)">
-            <TextArea rows={3} placeholder="https://example.com/image1.jpg\nhttps://example.com/image2.jpg" />
+          <Form.Item name="images" label="Additional Images">
+            <ImageUpload
+              category="portfolio"
+              maxCount={5}
+              value={form.getFieldValue('images')?.split('\n').filter(Boolean) || []}
+              onChange={(urls) => form.setFieldsValue({ images: urls.join('\n') })}
+            />
           </Form.Item>
           
           <Form.Item name="client" label="Client">

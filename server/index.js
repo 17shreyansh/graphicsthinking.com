@@ -3,6 +3,8 @@ const cors = require('cors')
 const helmet = require('helmet')
 const compression = require('compression')
 const morgan = require('morgan')
+const cookieParser = require('cookie-parser')
+const path = require('path')
 require('dotenv').config()
 
 const connectDB = require('./config/database')
@@ -16,7 +18,9 @@ const PORT = process.env.PORT || 5000
 connectDB()
 
 // Security & Performance Middleware
-app.use(helmet())
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}))
 app.use(compression())
 app.use(morgan('combined'))
 app.use(cors({
@@ -24,7 +28,16 @@ app.use(cors({
   credentials: true
 }))
 app.use(express.json({ limit: '10mb' }))
-app.use('/uploads', express.static('uploads'))
+app.use(cookieParser()) // Add this line
+// Static file serving with proper headers
+app.use('/uploads', (req, res, next) => {
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin')
+  res.header('Access-Control-Allow-Origin', '*')
+  next()
+}, express.static(path.join(__dirname, 'uploads'), {
+  maxAge: '1d',
+  etag: true
+}))
 app.use('/api/upload', require('./routes/upload'))
 
 // Rate Limiting (disabled for development)
@@ -37,6 +50,7 @@ app.use('/api/services', cacheMiddleware(600), require('./routes/services'))
 app.use('/api/testimonials', cacheMiddleware(600), require('./routes/testimonials'))
 app.use('/api/contact', require('./routes/contact'))
 app.use('/api/admin', require('./routes/admin'))
+app.use('/api/auth', require('./routes/auth')) // Add this line
 
 // Health Check
 app.get('/health', (req, res) => {

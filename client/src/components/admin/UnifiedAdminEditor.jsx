@@ -8,7 +8,7 @@ import {
   StatLabel, StatNumber, StatHelpText, Image
 } from '@chakra-ui/react'
 import { FaPlus, FaEdit, FaTrash, FaEye, FaChartBar, FaBriefcase, FaEnvelope, FaUsers } from 'react-icons/fa'
-import { portfolioAPI, servicesAPI, contactAPI } from '../../services/api'
+import { portfolioAPI, servicesAPI, contactAPI, SERVER_BASE_URL } from '../../services/api'
 import AdminAuthPerfect from '../AdminAuthPerfect'
 
 export default function UnifiedAdminEditor() {
@@ -58,7 +58,7 @@ export default function UnifiedAdminEditor() {
       setError('')
       
       // Test if backend is running
-      const testResponse = await fetch('http://localhost:5000/health').catch(() => null)
+      const testResponse = await fetch(`${SERVER_BASE_URL}/health`).catch(() => null)
       if (!testResponse) {
         setError('Backend server is not running. Please start the server.')
         return

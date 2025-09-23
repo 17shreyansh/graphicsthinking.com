@@ -1,7 +1,11 @@
 const express = require('express')
 const Portfolio = require('../models/Portfolio')
 const { multiple } = require('../middleware/upload')
+const { imageTransformMiddleware } = require('../middleware/imageTransform')
 const router = express.Router()
+
+// Apply image transform middleware to all routes
+router.use(imageTransformMiddleware)
 
 // DSA: Query optimization with caching and smart filtering
 class PortfolioQueryBuilder {

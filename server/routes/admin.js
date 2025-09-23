@@ -2,7 +2,11 @@ const express = require('express')
 const Portfolio = require('../models/Portfolio')
 const Service = require('../models/Service')
 const Contact = require('../models/Contact')
+const { protect } = require('../middleware/auth')
 const router = express.Router()
+
+// Apply protect middleware to all admin routes
+router.use(protect)
 
 // Get comprehensive dashboard statistics
 router.get('/stats', async (req, res) => {

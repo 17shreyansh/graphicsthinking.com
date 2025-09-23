@@ -1,27 +1,37 @@
 import { useState, useEffect } from 'react'
-import { Card, Row, Col, Statistic, List, Avatar, Badge, Spin, Alert } from 'antd'
-import { UserOutlined, ProjectOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
+import { Card, Row, Col, Statistic, List, Avatar, Badge, Spin, Alert, Typography } from 'antd'
+import { UserOutlined, ProjectOutlined, MessageOutlined, StarOutlined, FileImageOutlined } from '@ant-design/icons'
 import { adminApiService } from '../../services/adminApi'
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
+  const [recent, setRecent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetchStats()
+    fetchDashboardData()
   }, [])
 
-  const fetchStats = async () => {
+  const fetchDashboardData = async () => {
     try {
       setLoading(true)
-      console.log('Fetching dashboard stats...')
-      const data = await adminApiService.dashboard.getStats()
-      console.log('Dashboard API response:', data)
-      setStats(data)
+      const dashboardData = await adminApiService.dashboard.getStats()
+      setStats({
+        totalPortfolio: dashboardData.portfolio.total,
+        featuredPortfolio: dashboardData.portfolio.featured,
+        totalServices: dashboardData.services.total,
+        totalMessages: dashboardData.messages.total,
+        newMessages: dashboardData.messages.new
+      })
+      setRecent({
+        portfolio: dashboardData.portfolio.recent,
+        messages: dashboardData.messages.recent,
+        services: dashboardData.services.recent
+      })
     } catch (err) {
       console.error('Dashboard fetch error:', err)
-      setError(err.message)
+      setError(err.message || 'Failed to load dashboard data')
     } finally {
       setLoading(false)
     }
@@ -37,9 +47,9 @@ export default function Dashboard() {
           <Card>
             <Statistic
               title="Portfolio Items"
-              value={stats?.portfolio.total || 0}
+              value={stats?.totalPortfolio || 0}
               prefix={<ProjectOutlined />}
-              suffix={`(${stats?.portfolio.featured || 0} featured)`}
+              suffix={`(${stats?.featuredPortfolio || 0} featured)`}
             />
           </Card>
         </Col>
@@ -47,8 +57,9 @@ export default function Dashboard() {
           <Card>
             <Statistic
               title="Services"
-              value={stats?.services.total || 0}
+              value={stats?.totalServices || 0}
               prefix={<UserOutlined />}
+              suffix={`(${stats?.popularServices || 0} popular)`}
             />
           </Card>
         </Col>
@@ -56,9 +67,9 @@ export default function Dashboard() {
           <Card>
             <Statistic
               title="Messages"
-              value={stats?.messages.total || 0}
+              value={stats?.totalMessages || 0}
               prefix={<MessageOutlined />}
-              suffix={`(${stats?.messages.new || 0} new)`}
+              suffix={`(${stats?.newMessages || 0} new)`}
             />
           </Card>
         </Col>
@@ -66,7 +77,7 @@ export default function Dashboard() {
           <Card>
             <Statistic
               title="Total Content"
-              value={(stats?.portfolio.total || 0) + (stats?.services.total || 0)}
+              value={(stats?.totalPortfolio || 0) + (stats?.totalServices || 0)}
               prefix={<StarOutlined />}
             />
           </Card>
@@ -78,7 +89,7 @@ export default function Dashboard() {
           <Card title="Recent Portfolio" size="small">
             <List
               itemLayout="horizontal"
-              dataSource={stats?.portfolio.recent || []}
+              dataSource={recent?.portfolio || []}
               renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
@@ -96,7 +107,7 @@ export default function Dashboard() {
           <Card title="Recent Messages" size="small">
             <List
               itemLayout="horizontal"
-              dataSource={stats?.messages.recent || []}
+              dataSource={recent?.messages || []}
               renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta

@@ -14,10 +14,20 @@
     "test": "cd client && npm test",
     "lint": "cd client && npm run lint"
   },
-  "keywords": ["portfolio", "graphic-design", "react", "nodejs"],
+  "keywords": [
+    "portfolio",
+    "graphic-design",
+    "react",
+    "nodejs"
+  ],
   "author": "Graphics Thinking",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "jsonwebtoken": "^9.0.2"
   }
 }

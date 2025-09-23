@@ -18,10 +18,26 @@ const FeaturedWorkCard = ({ item, index }) => {
     brown: 'brand.brown'
   }
 
+  // Get portfolio URL - prefer slug over ID
+  const getPortfolioUrl = (item) => {
+    if (item.slug) return `/portfolio/${item.slug}`
+    
+    const rawId = item._id || item.id
+    if (typeof rawId === 'object' && rawId !== null) {
+      if (rawId.$oid) return `/portfolio/${rawId.$oid}`
+      if (rawId.buffer) {
+        const id = Object.values(rawId.buffer).map(byte => byte.toString(16).padStart(2, '0')).join('')
+        return `/portfolio/${id}`
+      }
+      return `/portfolio/${String(rawId)}`
+    }
+    return `/portfolio/${String(rawId)}`
+  }
+
   return (
     <MotionBox
       as={Link}
-      to={`/portfolio/${item._id}`}
+      to={getPortfolioUrl(item)}
       whileHover={{ y: -10, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)", scale: 1.02 }}
       transition={{ duration: 0.3 }}
     >

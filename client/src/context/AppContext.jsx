@@ -1,6 +1,7 @@
-import { createContext, useContext, useReducer } from 'react'
+import { createContext, useContext, useReducer, useState } from 'react'
 
 const AppContext = createContext()
+export { AppContext }
 
 const initialState = {
   portfolio: [],
@@ -8,7 +9,8 @@ const initialState = {
   blog: [],
   testimonials: [],
   loading: false,
-  error: null
+  error: null,
+  isAuthenticated: false
 }
 
 const appReducer = (state, action) => {
@@ -25,16 +27,43 @@ const appReducer = (state, action) => {
       return { ...state, blog: action.payload, loading: false }
     case 'SET_TESTIMONIALS':
       return { ...state, testimonials: action.payload, loading: false }
+    case 'SET_AUTHENTICATED':
+      return { ...state, isAuthenticated: action.payload }
     default:
       return state
   }
 }
 
 export const AppProvider = ({ children }) => {
+  const [theme, setTheme] = useState('light');
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('adminAuth') === 'true'
+  });
   const [state, dispatch] = useReducer(appReducer, initialState)
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  const login = () => {
+    setIsAuthenticated(true)
+    localStorage.setItem('adminAuth', 'true')
+  };
+  const logout = () => {
+    setIsAuthenticated(false)
+    localStorage.removeItem('adminAuth')
+  };
   
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ 
+      ...state,
+      dispatch,
+      theme, 
+      toggleTheme, 
+      isAuthenticated, 
+      login, 
+      logout 
+    }}>
       {children}
     </AppContext.Provider>
   )

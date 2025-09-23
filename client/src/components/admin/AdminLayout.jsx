@@ -1,41 +1,49 @@
-import { useState, useEffect } from 'react'
-import { Layout, Menu, Button, Typography, Space } from 'antd'
+import { useState, useEffect, useContext } from 'react'
+import { Layout, Menu, Button, Typography, message } from 'antd'
 import { 
   DashboardOutlined, 
   ProjectOutlined, 
   CustomerServiceOutlined, 
   MessageOutlined,
+  PictureOutlined,
   LogoutOutlined 
 } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
+import { AppContext } from '../../context/AppContext'
+import { authAPI } from '../../services/api'
 import Dashboard from './Dashboard'
 import Portfolio from './Portfolio'
 import Services from './Services'
 import Messages from './Messages'
-import AdminAuthPerfect from '../AdminAuthPerfect'
+import ImageManager from './ImageManager'
 
 const { Header, Sider, Content } = Layout
 const { Title } = Typography
 
 export default function AdminLayout() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [selectedKey, setSelectedKey] = useState('dashboard')
   const [collapsed, setCollapsed] = useState(false)
+  const { isAuthenticated, logout } = useContext(AppContext)
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const authStatus = localStorage.getItem('adminAuth')
-    setIsAuthenticated(authStatus === 'true')
-  }, [])
+    if (!isAuthenticated) {
+      navigate('/admin/login')
+    }
+  }, [isAuthenticated, navigate])
 
-  const handleLogin = () => setIsAuthenticated(true)
-
-  const handleLogout = () => {
-    localStorage.removeItem('adminAuth')
-    setIsAuthenticated(false)
+  const handleLogout = async () => {
+    try {
+      await authAPI.logout()
+      logout()
+      message.success('Logged out successfully')
+      navigate('/admin/login')
+    } catch (error) {
+      message.error('Logout failed')
+    }
   }
 
-  if (!isAuthenticated) {
-    return <AdminAuthPerfect onLogin={handleLogin} />
-  }
+
 
   const menuItems = [
     {
@@ -54,6 +62,11 @@ export default function AdminLayout() {
       label: 'Services'
     },
     {
+      key: 'images',
+      icon: <PictureOutlined />,
+      label: 'Images'
+    },
+    {
       key: 'messages',
       icon: <MessageOutlined />,
       label: 'Messages'
@@ -68,6 +81,8 @@ export default function AdminLayout() {
         return <Portfolio />
       case 'services':
         return <Services />
+      case 'images':
+        return <ImageManager />
       case 'messages':
         return <Messages />
       default:

@@ -27,17 +27,37 @@ export default function PortfolioDetail() {
   const fetchPortfolioDetail = async () => {
     setLoading(true)
     try {
-      // Try slug first, then fallback to ID
+      console.log('Fetching portfolio with ID/slug:', id)
       let response
-      try {
-        response = await fetch(`http://localhost:5000/api/portfolio/slug/${id}`).then(r => r.json())
-      } catch {
+      
+      // Check if id looks like a slug (contains non-hex characters or hyphens)
+      if (id.includes('-') || !/^[0-9a-f]{24}$/i.test(id)) {
+        console.log('Fetching by slug:', id)
+        response = await portfolioAPI.getBySlug(id)
+      } else {
+        console.log('Fetching by ID:', id)
         response = await portfolioAPI.getById(id)
       }
-      setPortfolio(response.portfolio)
+      
+      console.log('Raw API response:', response)
+      let portfolioData = response.portfolio || response.data || response
+      
+      // Handle Mongoose document structure
+      if (portfolioData._doc) {
+        portfolioData = portfolioData._doc
+      }
+      
+      console.log('Extracted portfolio data:', portfolioData)
+      
+      if (!portfolioData || (typeof portfolioData === 'object' && Object.keys(portfolioData).length === 0)) {
+        throw new Error('No portfolio data received')
+      }
+      
+      setPortfolio(portfolioData)
       setRelated(response.related || [])
     } catch (error) {
       console.error('Failed to fetch portfolio item:', error)
+      console.error('Error details:', error.response?.data || error.message)
       setPortfolio(null)
       setRelated([])
     } finally {
@@ -59,15 +79,26 @@ export default function PortfolioDetail() {
   }
 
   if (loading) return <Loading message="Loading portfolio details..." />
+  
   if (!portfolio) {
     return (
       <Box p={20} textAlign="center">
         <Text fontSize="xl" color="gray.600">Portfolio item not found</Text>
+        <Text fontSize="sm" color="gray.500" mt={2}>ID/Slug: {id}</Text>
         <Button as={RouterLink} to="/portfolio" mt={4} colorScheme="red">
           Back to Portfolio
         </Button>
       </Box>
     )
+  }
+  
+  // Fallback data if portfolio exists but missing fields
+  const safePortfolio = {
+    title: 'Untitled Project',
+    description: 'No description available',
+    category: 'Other',
+    image: 'https://via.placeholder.com/500x300/E53E3E/FFFFFF?text=No+Image',
+    ...portfolio
   }
 
   return (
@@ -83,7 +114,7 @@ export default function PortfolioDetail() {
               <BreadcrumbLink as={RouterLink} to="/portfolio">Portfolio</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbItem isCurrentPage>
-              <BreadcrumbLink>{portfolio.title}</BreadcrumbLink>
+              <BreadcrumbLink>{safePortfolio.title}</BreadcrumbLink>
             </BreadcrumbItem>
           </Breadcrumb>
 
@@ -110,8 +141,8 @@ export default function PortfolioDetail() {
                 transition={{ duration: 0.6 }}
               >
                 <Image
-                  src={portfolio.image}
-                  alt={portfolio.title}
+                  src={safePortfolio.image}
+                  alt={safePortfolio.title}
                   w="100%"
                   h="500px"
                   objectFit="cover"
@@ -121,7 +152,7 @@ export default function PortfolioDetail() {
               </MotionBox>
 
               {/* Additional Images */}
-              {portfolio.images && portfolio.images.length > 1 && (
+              {safePortfolio.images && safePortfolio.images.length > 1 && (
                 <MotionBox
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -129,11 +160,11 @@ export default function PortfolioDetail() {
                 >
                   <Heading size="md" mb={4} fontFamily="accent">Project Gallery</Heading>
                   <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4}>
-                    {portfolio.images.slice(1).map((image, index) => (
+                    {safePortfolio.images.slice(1).map((image, index) => (
                       <MotionImage
                         key={index}
                         src={image}
-                        alt={`${portfolio.title} ${index + 2}`}
+                        alt={`${safePortfolio.title} ${index + 2}`}
                         w="100%"
                         h="200px"
                         objectFit="cover"
@@ -148,7 +179,7 @@ export default function PortfolioDetail() {
               )}
 
               {/* Detailed Description */}
-              {portfolio.detailedDescription && (
+              {safePortfolio.detailedDescription && (
                 <MotionBox
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -156,7 +187,7 @@ export default function PortfolioDetail() {
                 >
                   <Heading size="md" mb={4} fontFamily="accent">Project Details</Heading>
                   <Text color="gray.600" lineHeight="1.8" fontSize="lg">
-                    {portfolio.detailedDescription}
+                    {safePortfolio.detailedDescription}
                   </Text>
                 </MotionBox>
               )}
@@ -171,12 +202,12 @@ export default function PortfolioDetail() {
               <VStack spacing={6} align="stretch">
                 {/* Title and Category */}
                 <VStack align="start" spacing={3}>
-                  <Tag colorScheme="red" size="lg">{portfolio.category}</Tag>
+                  <Tag colorScheme="red" size="lg">{safePortfolio.category}</Tag>
                   <Heading fontSize="3xl" fontFamily="heading" color="gray.800">
-                    {portfolio.title}
+                    {safePortfolio.title}
                   </Heading>
                   <Text color="gray.600" fontSize="lg" lineHeight="1.6">
-                    {portfolio.description}
+                    {safePortfolio.description}
                   </Text>
                 </VStack>
 
@@ -292,11 +323,31 @@ export default function PortfolioDetail() {
                   Related Projects
                 </Heading>
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
-                  {related.map((item, index) => (
+                  {related.map((item, index) => {
+                    const getPortfolioUrl = (item) => {
+                      if (item.slug) return `/portfolio/${item.slug}`
+                      
+                      const rawId = item._id || item.id
+                      if (typeof rawId === 'object' && rawId !== null) {
+                        if (rawId.$oid) return `/portfolio/${rawId.$oid}`
+                        if (rawId.buffer) {
+                          const id = Object.values(rawId.buffer).map(byte => byte.toString(16).padStart(2, '0')).join('')
+                          return `/portfolio/${id}`
+                        }
+                        return `/portfolio/${String(rawId)}`
+                      }
+                      return `/portfolio/${String(rawId)}`
+                    }
+                    
+                    const getItemKey = (item) => {
+                      return item.slug || item._id || item.id || index
+                    }
+                    
+                    return (
                     <MotionBox
-                      key={item._id}
+                      key={getItemKey(item)}
                       as={RouterLink}
-                      to={`/portfolio/${item._id}`}
+                      to={getPortfolioUrl(item)}
                       whileHover={{ y: -5 }}
                       transition={{ duration: 0.3 }}
                     >
@@ -327,7 +378,7 @@ export default function PortfolioDetail() {
                         </Box>
                       </Box>
                     </MotionBox>
-                  ))}
+                  )})}
                 </SimpleGrid>
               </VStack>
             </MotionBox>

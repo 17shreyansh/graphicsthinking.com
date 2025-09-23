@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Table, Button, Modal, Form, Input, Select, InputNumber, Space, Popconfirm, message, Tag, Rate, Switch } from 'antd'
+import { Table, Button, Modal, Form, Input, Select, InputNumber, Space, Popconfirm, message, Tag, Rate, Switch, Image } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, StarOutlined } from '@ant-design/icons'
 import { adminApiService } from '../../services/adminApi'
+import ImageUpload from './ImageUpload'
 
 const { TextArea } = Input
 
@@ -121,6 +122,15 @@ export default function Services() {
 
   const columns = [
     {
+      title: 'Image',
+      key: 'image',
+      width: 80,
+      render: (_, record) => {
+        const image = record.media?.primaryImage || record.image
+        return image ? <Image src={image} width={50} height={50} style={{ objectFit: 'cover' }} /> : null
+      }
+    },
+    {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
@@ -216,7 +226,7 @@ export default function Services() {
       <Table
         columns={columns}
         dataSource={data}
-        rowKey="_id"
+        rowKey={(record) => record._id || record.id || Math.random().toString()}
         loading={loading}
         pagination={{ pageSize: 10 }}
         scroll={{ x: 1400 }}
@@ -229,7 +239,7 @@ export default function Services() {
         footer={null}
         width={900}
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form form={form} layout="vertical" onFinish={handleSubmit} preserve={false}>
           <Form.Item name="name" label="Service Name" rules={[{ required: true, max: 200 }]}>
             <Input placeholder="Enter service name" />
           </Form.Item>
@@ -272,8 +282,13 @@ export default function Services() {
             </Form.Item>
           </div>
           
-          <Form.Item name="primaryImage" label="Primary Image URL">
-            <Input placeholder="https://example.com/service-image.jpg" />
+          <Form.Item name="primaryImage" label="Primary Image">
+            <ImageUpload
+              category="services"
+              maxCount={1}
+              value={form.getFieldValue('primaryImage')}
+              onChange={(url) => form.setFieldsValue({ primaryImage: url })}
+            />
           </Form.Item>
           
           <Form.Item name="features" label="Features (comma separated)">

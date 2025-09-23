@@ -1,78 +1,67 @@
-import { Text, HStack, Box, VStack } from '@chakra-ui/react'
+import { Text, Box, Flex } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 
-const MotionText = motion(Text)
 const MotionBox = motion(Box)
 
 export default function Logo({ size = 'md' }) {
-  const sizes = {
-    sm: { fontSize: 'lg', iconSize: 6 },
-    md: { fontSize: '2xl', iconSize: 8 },
-    lg: { fontSize: '4xl', iconSize: 12 }
-  }
-
   return (
-    <HStack spacing={3} align="center">
+    <Flex align="center" gap={3} h="fit-content" py={1}>
       <MotionBox
+        w={{ base: 8, md: 10 }}
+        h={{ base: 8, md: 10 }}
+        bg="brand.red"
+        borderRadius="md"
         position="relative"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
         whileHover={{ rotate: 5 }}
         transition={{ duration: 0.3 }}
+        flexShrink={0}
       >
         <Box
-          w={sizes[size].iconSize}
-          h={sizes[size].iconSize}
-          bg="brand.red"
-          borderRadius="lg"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          position="relative"
-          overflow="hidden"
-        >
-          <Box
-            position="absolute"
-            top="0"
-            right="0"
-            w="30%"
-            h="30%"
-            bg="brand.blue"
-            borderRadius="0 lg 0 lg"
-          />
-          <Box
-            position="absolute"
-            bottom="0"
-            left="0"
-            w="30%"
-            h="30%"
-            bg="brand.brown"
-            borderRadius="lg 0 lg 0"
-          />
-          <Text color="white" fontWeight="bold" fontSize={size === 'lg' ? 'xl' : 'md'} zIndex={1}>
-            GT
-          </Text>
-        </Box>
+          position="absolute"
+          top={0}
+          right={0}
+          w={2}
+          h={2}
+          bg="brand.blue"
+          borderTopRightRadius="md"
+        />
+        <Box
+          position="absolute"
+          bottom={0}
+          left={0}
+          w={2}
+          h={2}
+          bg="brand.brown"
+          borderBottomLeftRadius="md"
+        />
+        <Text color="white" fontWeight="bold" fontSize={{ base: 'sm', md: 'md' }}>
+          GT
+        </Text>
       </MotionBox>
-      <VStack spacing={0} align="start">
-        <MotionText
-          fontSize={sizes[size].fontSize}
+      
+      <Flex direction="column" justify="center" align="start" h="fit-content">
+        <Text
+          fontSize={{ base: 'md', md: 'lg' }}
           fontFamily="heading"
-          color="#ffcccc"
-          lineHeight="0.9"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
+          color="white"
+          lineHeight="1.2"
+          mb={-0.5}
         >
           GRAPHICS
-        </MotionText>
+        </Text>
         <Text
-          fontSize={size === 'lg' ? 'lg' : size === 'md' ? 'sm' : 'xs'}
+          fontSize={{ base: 'xs', md: 'sm' }}
           fontFamily="accent"
-          color="#ffd8bd"
-          fontWeight="600"
-          letterSpacing="wider"
+          color="gray.300"
+          fontWeight="500"
+          lineHeight="1.2"
         >
           THINKING
         </Text>
-      </VStack>
-    </HStack>
+      </Flex>
+    </Flex>
   )
 }

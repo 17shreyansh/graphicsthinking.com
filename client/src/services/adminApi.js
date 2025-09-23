@@ -130,5 +130,27 @@ export const adminApiService = {
     },
     update: (id, data) => contactAPI.update(id, data),
     delete: (id) => contactAPI.delete(id)
-  }
+  },
+
+  // Admin APIs
+  getStats: async () => {
+    try {
+      return await adminAPI.getStats()
+    } catch (error) {
+      console.error('Admin stats error:', error)
+      throw error
+    }
+  },
+
+  getRecent: async () => {
+    try {
+      return await adminAPI.getRecent()
+    } catch (error) {
+      console.error('Admin recent error:', error)
+      throw error
+    }
+  },
+
+  bulkAction: (type, action, ids) => adminAPI.bulkAction(type, action, ids),
+  export: (type, format) => adminAPI.export(type, format)
 }

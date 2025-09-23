@@ -94,7 +94,7 @@ A modern, professional portfolio website for graphic design services built with 
 - **About**: Company story, team, philosophy
 - **Portfolio**: Filterable gallery of work
 - **Services**: Service offerings with pricing
-- **Blog**: Design tips and insights
+
 - **Contact**: Contact form and information
 - **Admin**: Content management panel
 
@@ -103,7 +103,7 @@ A modern, professional portfolio website for graphic design services built with 
 Access the admin panel at `/admin` to manage:
 - Portfolio items
 - Services and pricing
-- Blog posts
+- Image uploads
 - Contact messages
 
 ## 📧 Email Configuration

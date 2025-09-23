@@ -1,10 +1,13 @@
 import axios from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+export { API_BASE_URL }
+export const SERVER_BASE_URL = API_BASE_URL.replace('/api', '')
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -31,6 +34,7 @@ export const portfolioAPI = {
     return api.get(`/portfolio${queryString ? `?${queryString}` : ''}`)
   },
   getById: (id) => api.get(`/portfolio/${id}`),
+  getBySlug: (slug) => api.get(`/portfolio/slug/${slug}`),
   create: (data) => api.post('/portfolio', data),
   update: (id, data) => api.put(`/portfolio/${id}`, data),
   delete: (id) => api.delete(`/portfolio/${id}`)
@@ -82,6 +86,12 @@ export const uploadAPI = {
       }
     })
   }
+}
+
+export const authAPI = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  logout: () => api.get('/auth/logout'),
+  checkAuth: () => api.get('/auth/check')
 }
 
 export default api

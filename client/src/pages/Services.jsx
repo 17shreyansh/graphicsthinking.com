@@ -64,14 +64,16 @@ const ServiceCard = ({ service, index }) => {
       <Heading size="md" mb={4} fontFamily="accent" color="white">{service.name}</Heading>
       <Text color="gray.300" mb={6} lineHeight="1.6">{service.description}</Text>
 
-      <VStack spacing={2}>
+      <VStack spacing={3}>
         <Button
           as={RouterLink}
           to={`/services/${service.slug || service.seo?.slug || service._id}`}
           bg={colorConfig[colorScheme].icon}
           color="white"
-          size="md"
+          size={{ base: "sm", md: "md" }}
           w="full"
+          minH={{ base: "40px", md: "44px" }}
+          fontSize={{ base: "sm", md: "md" }}
           _hover={{
             transform: 'translateY(-2px)',
             boxShadow: 'lg'
@@ -85,8 +87,10 @@ const ServiceCard = ({ service, index }) => {
           variant="outline"
           borderColor={colorConfig[colorScheme].icon}
           color={colorConfig[colorScheme].icon}
-          size="sm"
+          size={{ base: "sm", md: "md" }}
           w="full"
+          minH={{ base: "36px", md: "40px" }}
+          fontSize={{ base: "xs", md: "sm" }}
         >
           Get Quote
         </Button>
@@ -173,13 +177,15 @@ export default function Services() {
                 Don't see what you're looking for? We offer custom design solutions 
                 tailored to your specific requirements.
               </Text>
-              <HStack spacing={4}>
+              <VStack spacing={4} w="full">
                 <Button
                   as={RouterLink}
                   to="/contact"
                   bg="white"
                   color="brand.red"
-                  size="lg"
+                  size={{ base: "md", md: "lg" }}
+                  w={{ base: "full", md: "auto" }}
+                  minW={{ base: "full", md: "200px" }}
                   _hover={{ transform: 'translateY(-2px)' }}
                 >
                   Discuss Your Project
@@ -190,12 +196,14 @@ export default function Services() {
                   variant="outline"
                   borderColor="white"
                   color="white"
-                  size="lg"
+                  size={{ base: "md", md: "lg" }}
+                  w={{ base: "full", md: "auto" }}
+                  minW={{ base: "full", md: "180px" }}
                   _hover={{ bg: 'white', color: 'brand.red' }}
                 >
                   View Our Work
                 </Button>
-              </HStack>
+              </VStack>
             </VStack>
           </MotionBox>
         </VStack>
